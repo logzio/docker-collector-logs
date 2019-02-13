@@ -18,11 +18,21 @@ def isOpen():
         print("""Host: %s \nPort: %s""" % (logzio_url_arr[0], logzio_url_arr[1]))
         sys.exit(1)
 
-def exclude_containers():
+def add_shipping_data():
     yaml = YAML()
     with open("default_filebeat.yml") as file:
         config_dic = yaml.load(file)
-        
+
+    config_dic["output"]["logstash"]["hosts"].append(os.environ["LOGZIO_URL"])
+    config_dic["filebeat.inputs"][0]["fields"]["token"] = os.environ["LOGZIO_TOKEN"]
+
+    with open("/etc/filebeat/filebeat.yml", "w+") as file:
+        yaml.dump(config_dic, file)
+
+def exclude_containers():
+    yaml = YAML()
+    with open("/etc/filebeat/filebeat.yml") as file:
+        config_dic = yaml.load(file)
 
     try:
         exclude_list = ["filebeat"] + os.environ["skipContainerName"].split(",")
@@ -36,16 +46,13 @@ def exclude_containers():
         contains = {"contains": {"docker.container.name": name}}
         config_dic["filebeat.inputs"][0]["processors"][1]["drop_event"]["when"]["or"].append(contains)
 
-    config_dic["output"]["logstash"]["hosts"].append(os.environ["LOGZIO_URL"])
-    config_dic["filebeat.inputs"][0]["fields"]["token"] = os.environ["LOGZIO_TOKEN"]
-
     with open("/etc/filebeat/filebeat.yml", "w+") as file:
         yaml.dump(config_dic, file)
 
 
 def include_containers():
     yaml = YAML()
-    with open("default_filebeat.yml") as file:
+    with open("/etc/filebeat/filebeat.yml") as file:
         config_dic = yaml.load(file)
 
     include_list = os.environ["matchContainerName"].split(",")
@@ -56,19 +63,18 @@ def include_containers():
         contains = {"not":{"contains": {"docker.container.name": name}}}
         config_dic["filebeat.inputs"][0]["processors"][1]["drop_event"]["when"]["and"].append(contains)
 
-    config_dic["output"]["logstash"]["hosts"].append(os.environ["LOGZIO_URL"])
-    config_dic["filebeat.inputs"][0]["fields"]["token"] = os.environ["LOGZIO_TOKEN"]
-
     with open("/etc/filebeat/filebeat.yml", "w+") as file:
         yaml.dump(config_dic, file)
 
 
 isOpen()
+add_shipping_data()
+
 if "matchContainerName" in os.environ and "skipContainerName" in os.environ:
     print ("Can have only one of skipContainerName or matchContainerName")
 elif "matchContainerName" in os.environ:
     include_containers()
-else:
+elif: "skipContainerName" in os.environ
     exclude_containers()
 
 os.system("filebeat -e")
