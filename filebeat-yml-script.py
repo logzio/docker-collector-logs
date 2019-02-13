@@ -74,7 +74,7 @@ if "matchContainerName" in os.environ and "skipContainerName" in os.environ:
     print ("Can have only one of skipContainerName or matchContainerName")
 elif "matchContainerName" in os.environ:
     include_containers()
-elif: "skipContainerName" in os.environ
+elif "skipContainerName" in os.environ:
     exclude_containers()
 
 os.system("filebeat -e")
