@@ -1,0 +1,23 @@
+############################# Filebeat #####################################
+
+filebeat.inputs:
+
+- type: docker
+  containers:
+    path: /var/lib/docker/containers
+    ids: '*'
+  fields:
+    logzio_codec: plain
+    type: docker-logs
+  fields_under_root: true
+  processors:
+  - add_docker_metadata: ~
+registry_file: /var/lib/filebeat/registry
+
+############################# Output ##########################################
+
+output:
+  logstash:
+    hosts: []
+    ssl:
+      certificate_authorities: [/etc/pki/tls/certs/COMODORSADomainValidationSecureServerCA.crt]
