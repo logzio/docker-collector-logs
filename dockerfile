@@ -1,5 +1,7 @@
 FROM python:3.7-slim
 
+COPY requirements.txt ./requirements.txt
+
 RUN apt-get update && \
     apt-get install -y \
     curl \
@@ -11,7 +13,8 @@ RUN apt-get update && \
     mkdir -p /etc/pki/tls/certs && \
     cp COMODORSADomainValidationSecureServerCA.crt /etc/pki/tls/certs/ && \
     rm COMODORSADomainValidationSecureServerCA.crt && \
-    pip install ruamel.yaml
+    pip install -r requirements.txt && \
+    rm requirements.txt
 
 COPY default_filebeat.yml ./default_filebeat.yml
 COPY filebeat-yml-script.py ./filebeat-yml-script.py
