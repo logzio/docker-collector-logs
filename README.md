@@ -33,7 +33,7 @@ docker run --name filebeat-docker-collector --env LOGZIO_TOKEN="{{LOGZIO_TOKEN}}
 
 Shipping logs from all containers except containers that their name contains "jenkins"
 ```
-docker run --name filebeat-docker-collector --env LOGZIO_TOKEN="{{LOGZIO_TOKEN}}" --env LOGZIO_URL="listener.logz.io:5015" --env matchContainerName="jenkins" -v /var/run/docker.sock:/var/run/docker.sock:ro -v /var/lib/docker/containers:/var/lib/docker/containers logzio/docker-collector-logs
+docker run --name filebeat-docker-collector --env LOGZIO_TOKEN="{{LOGZIO_TOKEN}}" --env LOGZIO_URL="listener.logz.io:5015" --env skipContainerName="jenkins" -v /var/run/docker.sock:/var/run/docker.sock:ro -v /var/lib/docker/containers:/var/lib/docker/containers logzio/docker-collector-logs
 ```
 ## How it works
 This docker container is using a python script to generate a valid filebeat configuration file based on your enviornment variables, and then starts the service.  
