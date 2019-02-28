@@ -48,9 +48,9 @@ def _exclude_containers():
         config_dic = yaml.load(filebeat_yaml)
 
     try:
-        exclude_list = ["filebeat"] + [container.strip() for container in os.environ["skipContainerName"].split(",")]
+        exclude_list = ["docker-collector"] + [container.strip() for container in os.environ["skipContainerName"].split(",")]
     except KeyError:
-        exclude_list = ["filebeat"]
+        exclude_list = ["docker-collector"]
 
     drop_event = {"drop_event": {"when": {"or": []}}}
     config_dic["filebeat.inputs"][0]["processors"].append(drop_event)
