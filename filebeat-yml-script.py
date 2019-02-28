@@ -48,7 +48,7 @@ def _exclude_containers():
         config_dic = yaml.load(filebeat_yaml)
 
     try:
-        exclude_list = ["filebeat"] + os.environ["skipContainerName"].split(",")
+        exclude_list = ["filebeat"] + [container.strip() for container in os.environ["skipContainerName"].split(",")]
     except KeyError:
         exclude_list = ["filebeat"]
 
@@ -68,7 +68,8 @@ def _include_containers():
     with open(FILEBEAT_CONF_PATH) as filebeat_yml:
         config_dic = yaml.load(filebeat_yml)
 
-    include_list = os.environ["matchContainerName"].split(",")
+    include_list = [container.strip() for container in os.environ["matchContainerName"].split(",")]
+
     drop_event = {"drop_event": {"when": {"and": []}}}
     config_dic["filebeat.inputs"][0]["processors"].append(drop_event)
 
@@ -88,7 +89,7 @@ if "matchContainerName" in os.environ and "skipContainerName" in os.environ:
     raise KeyError
 elif "matchContainerName" in os.environ:
     _include_containers()
-elif "skipContainerName" in os.environ:
+else:
     _exclude_containers()
 
 os.system("filebeat -e")
