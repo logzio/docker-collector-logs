@@ -30,7 +30,7 @@ docker run logzio/docker-collector-logs
 --env LOGZIO_TOKEN="<ACCOUNT-TOKEN>" \
 --env LOGZIO_URL="<LISTENER-URL>:5015" \
 -v /var/run/docker.sock:/var/run/docker.sock:ro \
--v /var/lib/docker/containers:/var/lib/docker/containers \
+-v /var/lib/docker/containers:/var/lib/docker/containers
 ```
 
 #### Parameters
