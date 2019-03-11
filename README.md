@@ -25,7 +25,7 @@ docker pull logzio/docker-collector-logs
 For a complete list of options, see the parameters below the code block.👇
 
 ```shell
-docker run logzio/docker-collector-logs
+docker run logzio/docker-collector-logs \
 --name docker-collector-logs \
 --env LOGZIO_TOKEN="<ACCOUNT-TOKEN>" \
 --env LOGZIO_URL="<LISTENER-URL>:5015" \
