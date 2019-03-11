@@ -22,6 +22,8 @@ docker pull logzio/docker-collector-logs
 
 ### 2. Run the Docker image
 
+For a complete list of options, see the parameters below the code block.👇
+
 ```shell
 docker run logzio/docker-collector-logs
 --name docker-collector-logs \
