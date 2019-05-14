@@ -1,22 +1,23 @@
-FROM python:3.7-slim
+FROM python:3.7-alpine
 
-COPY requirements.txt ./requirements.txt
+ENV PACKAGE=filebeat-6.5.4-linux-x86_64.tar.gz
 
-RUN apt-get update && \
-    apt-get install -y \
-    curl \
-    wget && \
-    curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-6.5.4-amd64.deb && \
-    dpkg -i filebeat-6.5.4-amd64.deb && \
-    rm filebeat-6.5.4-amd64.deb && \
-    wget https://raw.githubusercontent.com/logzio/public-certificates/master/COMODORSADomainValidationSecureServerCA.crt && \
-    mkdir -p /etc/pki/tls/certs && \
-    cp COMODORSADomainValidationSecureServerCA.crt /etc/pki/tls/certs/ && \
-    rm COMODORSADomainValidationSecureServerCA.crt && \
-    pip install -r requirements.txt && \
-    rm requirements.txt
 
-COPY default_filebeat.yml ./default_filebeat.yml
-COPY filebeat-yml-script.py ./filebeat-yml-script.py
+RUN mkdir -p /opt/filebeat/docker-colletor-logs && \
+    mkdir -p /etc/pki/tls/certs
 
-CMD ["python","filebeat-yml-script.py"]
+WORKDIR /opt/filebeat
+
+COPY requirements.txt docker-colletor-logs/requirements.txt
+COPY default_filebeat.yml docker-colletor-logs/default_filebeat.yml
+COPY filebeat-yml-script.py docker-colletor-logs/filebeat-yml-script.py
+
+RUN apk add --update --no-cache libc6-compat wget tar && \
+    wget https://artifacts.elastic.co/downloads/beats/filebeat/$PACKAGE && \
+    tar --strip-components=1 -zxf /opt/filebeat/"$PACKAGE" && \
+    rm -f "$PACKAGE" && \
+    wget -P /etc/pki/tls/certs/ https://raw.githubusercontent.com/logzio/public-certificates/master/COMODORSADomainValidationSecureServerCA.crt && \
+    pip3 install -r ./docker-colletor-logs/requirements.txt --user && \
+    rm -f ./docker-colletor-logs/requirements.txt
+
+CMD [ "python3", "docker-colletor-logs/filebeat-yml-script.py" ]
