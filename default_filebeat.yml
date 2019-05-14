@@ -7,7 +7,6 @@ filebeat.inputs:
     path: /var/lib/docker/containers
     ids: '*'
   fields:
-    logzio_codec: plain
     type: docker-collector-logs
   fields_under_root: true
   processors:

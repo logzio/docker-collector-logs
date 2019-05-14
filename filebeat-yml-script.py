@@ -3,18 +3,27 @@ import os
 from ruamel.yaml import YAML
 import socket
 
+logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=logging.DEBUG)
+
 # set vars and consts
 
 logzio_url = os.environ["LOGZIO_URL"]
 logzio_url_arr = logzio_url.split(":")
 logzio_token = os.environ["LOGZIO_TOKEN"]
-
 HOST = logzio_url_arr[0]
 PORT = int(logzio_url_arr[1])
 FILEBEAT_CONF_PATH = f"{os.getcwd()}/filebeat.yml"
 SOCKET_TIMEOUT = 3
-
-logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=logging.DEBUG)
+try:
+    logzio_codec = os.environ['LOGZIO_CODEC'].lower()
+    logzio_codec_list = ["plain", "json"]
+    if logzio_codec not in logzio_codec_list:
+        logging.warning(f"LOGZIO_CODEC={logzio_codec} not supported. Make sure to use one of: {logzio_codec_list}. "
+                        f"Falling back to default LOGZIO_CODEC=plain")
+        logzio_codec = "plain"
+except KeyError:
+    logging.debug("LOGZIO_CODEC is not configured, falling back to default LOGZIO_CODEC=plain")
+    logzio_codec = "plain"
 
 
 def _is_open():
@@ -37,6 +46,7 @@ def _add_shipping_data():
 
     config_dic["output"]["logstash"]["hosts"].append(logzio_url)
     config_dic["filebeat.inputs"][0]["fields"]["token"] = logzio_token
+    config_dic["filebeat.inputs"][0]["fields"]["logzio_codec"] = logzio_codec
 
     with open(FILEBEAT_CONF_PATH, "w+") as filebeat_yml:
         yaml.dump(config_dic, filebeat_yml)
