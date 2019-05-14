@@ -10,20 +10,17 @@ logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=logg
 logzio_url = os.environ["LOGZIO_URL"]
 logzio_url_arr = logzio_url.split(":")
 logzio_token = os.environ["LOGZIO_TOKEN"]
+logzio_codec = os.getenv('LOGZIO_CODEC', 'plain').lower()
+logzio_codec_list = ["plain", "json"]
+if logzio_codec not in logzio_codec_list:
+    logging.warning(f"LOGZIO_CODEC={logzio_codec} not supported. Make sure you use one of following: "
+                    f"{logzio_codec_list}. Falling back to default LOGZIO_CODEC=plain")
+    logzio_codec = "plain"
+
 HOST = logzio_url_arr[0]
 PORT = int(logzio_url_arr[1])
 FILEBEAT_CONF_PATH = f"{os.getcwd()}/filebeat.yml"
 SOCKET_TIMEOUT = 3
-try:
-    logzio_codec = os.environ['LOGZIO_CODEC'].lower()
-    logzio_codec_list = ["plain", "json"]
-    if logzio_codec not in logzio_codec_list:
-        logging.warning(f"LOGZIO_CODEC={logzio_codec} not supported. Make sure to use one of: {logzio_codec_list}. "
-                        f"Falling back to default LOGZIO_CODEC=plain")
-        logzio_codec = "plain"
-except KeyError:
-    logging.debug("LOGZIO_CODEC is not configured, falling back to default LOGZIO_CODEC=plain")
-    logzio_codec = "plain"
 
 
 def _is_open():
