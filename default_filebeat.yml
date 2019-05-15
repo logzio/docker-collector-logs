@@ -6,8 +6,6 @@ filebeat.inputs:
   containers:
     path: /var/lib/docker/containers
     ids: '*'
-  fields:
-    type: docker-collector-logs
   fields_under_root: true
   processors:
   - add_docker_metadata: ~
