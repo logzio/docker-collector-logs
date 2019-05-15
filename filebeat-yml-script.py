@@ -3,18 +3,24 @@ import os
 from ruamel.yaml import YAML
 import socket
 
+logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=logging.DEBUG)
+
 # set vars and consts
 
 logzio_url = os.environ["LOGZIO_URL"]
 logzio_url_arr = logzio_url.split(":")
 logzio_token = os.environ["LOGZIO_TOKEN"]
+logzio_codec = os.getenv('LOGZIO_CODEC', 'plain').lower()
+logzio_codec_list = ["plain", "json"]
+if logzio_codec not in logzio_codec_list:
+    logging.warning(f"LOGZIO_CODEC={logzio_codec} not supported. Make sure you use one of following: "
+                    f"{logzio_codec_list}. Falling back to default LOGZIO_CODEC=plain")
+    logzio_codec = "plain"
 
 HOST = logzio_url_arr[0]
 PORT = int(logzio_url_arr[1])
-FILEBEAT_CONF_PATH = "/etc/filebeat/filebeat.yml"
+FILEBEAT_CONF_PATH = f"{os.getcwd()}/filebeat.yml"
 SOCKET_TIMEOUT = 3
-
-logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=logging.DEBUG)
 
 
 def _is_open():
@@ -32,11 +38,12 @@ def _is_open():
 
 def _add_shipping_data():
     yaml = YAML()
-    with open("default_filebeat.yml") as default_filebeat_yml:
+    with open("docker-colletor-logs/default_filebeat.yml") as default_filebeat_yml:
         config_dic = yaml.load(default_filebeat_yml)
 
     config_dic["output"]["logstash"]["hosts"].append(logzio_url)
     config_dic["filebeat.inputs"][0]["fields"]["token"] = logzio_token
+    config_dic["filebeat.inputs"][0]["fields"]["logzio_codec"] = logzio_codec
 
     with open(FILEBEAT_CONF_PATH, "w+") as filebeat_yml:
         yaml.dump(config_dic, filebeat_yml)
@@ -92,4 +99,4 @@ elif "matchContainerName" in os.environ:
 else:
     _exclude_containers()
 
-os.system("filebeat -e")
+os.system(f"{os.getcwd()}/filebeat -e -c {FILEBEAT_CONF_PATH}")
