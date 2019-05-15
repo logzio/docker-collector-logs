@@ -40,7 +40,7 @@ logzio/docker-collector-logs
 | **LOGZIO_TOKEN** | **Required**. Your Logz.io account token. Replace `<ACCOUNT-TOKEN>` with the [token](https://app.logz.io/#/dashboard/settings/general) of the account you want to ship to. |
 | **LOGZIO_URL** | **Required**. Logz.io listener URL to ship the logs to. This URL changes depending on the region your account is hosted in. For example, accounts in the US region ship to `listener.logz.io`, and accounts in the EU region ship to `listener-eu.logz.io`. <br /> For more information, see [Account region](https://docs.logz.io/user-guide/accounts/account-region.html) on the Logz.io Docs. |
 | **LOGZIO_TYPE** | **Default**: Docker image name <br> The log type you'll use with this Docker. This is shown in your logs under the `type` field in Kibana. <br> Logz.io applies parsing based on `type`. |
-| **LOGZIO_CODEC** | Set to `json` if you want to parse a json message field. Default is `plain`|
+| **LOGZIO_CODEC** | **Default**: `plain`<br> Set to `json` if shipping JSON logs. Otherwise, set to `plain`. |
 | **matchContainerName** | Comma-separated list of containers you want to collect the logs from. If a container's name partially matches a name on the list, that container's logs are shipped. Otherwise, its logs are ignored. <br /> **Note**: Can't be used with `skipContainerName` |
 | **skipContainerName** | Comma-separated list of containers you want to ignore. If a container's name partially matches a name on the list, that container's logs are ignored. Otherwise, its logs are shipped. <br /> **Note**: Can't be used with `matchContainerName` |
 
