@@ -20,7 +20,7 @@ Download the logzio/docker-collector-logs image:
 docker pull logzio/docker-collector-logs
 ```
 
-### 2. Run the Docker image
+### 2. Run the container
 
 For a complete list of options, see the parameters below the code block.👇
 
