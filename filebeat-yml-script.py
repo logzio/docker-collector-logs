@@ -23,6 +23,7 @@ HOST = logzio_url_arr[0]
 PORT = int(logzio_url_arr[1])
 FILEBEAT_CONF_PATH = f"{os.getcwd()}/filebeat.yml"
 SOCKET_TIMEOUT = 3
+FIRST_CHAR = 0
 
 
 def _is_open():
@@ -49,8 +50,30 @@ def _add_shipping_data():
     config_dic["filebeat.inputs"][0]["fields"]["logzio_codec"] = logzio_codec
     config_dic["filebeat.inputs"][0]["fields"]["type"] = logzio_type
 
+    additional_field = _get_additional_fields()
+    for key in additional_field:
+        config_dic["filebeat.inputs"][0]["fields"][key] = additional_field[key]
+
     with open(FILEBEAT_CONF_PATH, "w+") as filebeat_yml:
         yaml.dump(config_dic, filebeat_yml)
+
+
+def _get_additional_fields():
+    try:
+        s = os.environ["additionalFields"]
+    except KeyError:
+        return {}
+
+    additional_fields = dict(item.split("=") for item in s.split(";"))
+    for key, value in additional_fields.items():
+        if value[FIRST_CHAR] == '$':
+            try:
+                additional_fields[key] = os.environ[value[FIRST_CHAR+1:]]
+            except KeyError:
+                # If we can't find the environ let's delete it from our map
+                del additional_fields[key]
+
+    return additional_fields
 
 
 def _exclude_containers():
