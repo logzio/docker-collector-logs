@@ -60,20 +60,34 @@ def _add_shipping_data():
 
 def _get_additional_fields():
     try:
-        s = os.environ["additionalFields"]
+        additional_fields = os.environ["additionalFields"]
     except KeyError:
         return {}
 
-    additional_fields = dict(item.split("=") for item in s.split(";"))
-    for key, value in additional_fields.items():
-        if value[FIRST_CHAR] == '$':
-            try:
-                additional_fields[key] = os.environ[value[FIRST_CHAR+1:]]
-            except KeyError:
-                # If we can't find the environ let's delete it from our map
-                del additional_fields[key]
+    fields = {}
+    filtered = dict(parse_entry(entry) for entry in additional_fields.split(";"))
 
-    return additional_fields
+    for key, value in filtered.items():
+        if value[FIRST_CHAR] == '$' and key != '':
+            try:
+                fields[key] = os.environ[value[FIRST_CHAR+1:]]
+            except KeyError:
+                continue
+        elif key != '':
+            fields[key] = value
+
+    return fields
+
+
+def parse_entry(entry):
+    try:
+        key, value = entry.split("=")
+    except ValueError:
+        raise ValueError("Failed to parse entry: {}".format(entry))
+
+    if key == '' or value == '':
+        raise ValueError("Failed to parse entry: {}".format(entry))
+    return key, value
 
 
 def _exclude_containers():
