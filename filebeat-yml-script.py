@@ -68,12 +68,12 @@ def _get_additional_fields():
     filtered = dict(parse_entry(entry) for entry in additional_fields.split(";"))
 
     for key, value in filtered.items():
-        if value[FIRST_CHAR] == '$' and key != '':
+        if value[FIRST_CHAR] == '$':
             try:
                 fields[key] = os.environ[value[FIRST_CHAR+1:]]
             except KeyError:
                 continue
-        elif key != '':
+        else:
             fields[key] = value
 
     return fields
