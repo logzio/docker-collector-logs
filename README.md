@@ -52,4 +52,5 @@ logzio/docker-collector-logs
 Spin up your Docker containers if you haven’t done so already. Give your logs a few minutes to get from your system to ours, and then open [Kibana](https://app.logz.io/#/dashboard/kibana).
 
 ### Change log
+- 0.0.3: Support additional fields
 - 0.0.2: Add an option to configure logzio_codec and logzio_type
