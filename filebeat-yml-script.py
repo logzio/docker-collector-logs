@@ -23,6 +23,7 @@ HOST = logzio_url_arr[0]
 PORT = int(logzio_url_arr[1])
 FILEBEAT_CONF_PATH = f"{os.getcwd()}/filebeat.yml"
 SOCKET_TIMEOUT = 3
+FIRST_CHAR = 0
 
 
 def _is_open():
@@ -49,8 +50,44 @@ def _add_shipping_data():
     config_dic["filebeat.inputs"][0]["fields"]["logzio_codec"] = logzio_codec
     config_dic["filebeat.inputs"][0]["fields"]["type"] = logzio_type
 
+    additional_field = _get_additional_fields()
+    for key in additional_field:
+        config_dic["filebeat.inputs"][0]["fields"][key] = additional_field[key]
+
     with open(FILEBEAT_CONF_PATH, "w+") as filebeat_yml:
         yaml.dump(config_dic, filebeat_yml)
+
+
+def _get_additional_fields():
+    try:
+        additional_fields = os.environ["additionalFields"]
+    except KeyError:
+        return {}
+
+    fields = {}
+    filtered = dict(parse_entry(entry) for entry in additional_fields.split(";"))
+
+    for key, value in filtered.items():
+        if value[FIRST_CHAR] == '$':
+            try:
+                fields[key] = os.environ[value[FIRST_CHAR+1:]]
+            except KeyError:
+                continue
+        else:
+            fields[key] = value
+
+    return fields
+
+
+def parse_entry(entry):
+    try:
+        key, value = entry.split("=")
+    except ValueError:
+        raise ValueError("Failed to parse entry: {}".format(entry))
+
+    if key == '' or value == '':
+        raise ValueError("Failed to parse entry: {}".format(entry))
+    return key, value
 
 
 def _exclude_containers():
