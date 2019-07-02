@@ -43,7 +43,7 @@ logzio/docker-collector-logs
 | **LOGZIO_CODEC** | **Default**: `plain`<br> Set to `json` if shipping JSON logs. Otherwise, set to `plain`. |
 | **matchContainerName** | Comma-separated list of containers you want to collect the logs from. If a container's name partially matches a name on the list, that container's logs are shipped. Otherwise, its logs are ignored. <br /> **Note**: Can't be used with `skipContainerName` |
 | **skipContainerName** | Comma-separated list of containers you want to ignore. If a container's name partially matches a name on the list, that container's logs are ignored. Otherwise, its logs are shipped. <br /> **Note**: Can't be used with `matchContainerName` |
-| **additionalFields** | Allows to add additional fields to every message sent. The format is "fieldName1=fieldValue1;fieldName2=fieldValue2". You can optionally inject an environment variable value using the following format: "fieldName1=fieldValue1;fieldName2=$ENV_VAR_NAME". In that case, the environment variable should be the only value. In case the environment variable can't be resolved, the field will be omitted.|
+| **additionalFields** | Include additional fields with every message sent, formatted as `"fieldName1=fieldValue1;fieldName2=fieldValue2"`. <br /> To use an environment variable, format as `"fieldName1=fieldValue1;fieldName2=$ENV_VAR_NAME"`. In that case, the environment variable should be the only value in the field. In case the environment variable can't be resolved, the field will be omitted. |
 
 **Note**: By default, logs from `docker-collector-logs` and `docker-collector-metrics` containers are ignored.
 
