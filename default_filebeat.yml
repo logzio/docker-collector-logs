@@ -1,7 +1,6 @@
 ############################# Filebeat #####################################
 
 filebeat.inputs:
-
 - type: docker
   containers:
     path: /var/lib/docker/containers
@@ -9,6 +8,8 @@ filebeat.inputs:
   fields_under_root: true
   processors:
   - add_docker_metadata: ~
+  encoding: utf-8
+
 registry_file: /var/lib/filebeat/registry
 
 ############################# Output ##########################################
