@@ -49,6 +49,7 @@ def _add_shipping_data():
     config_dic["filebeat.inputs"][0]["fields"]["token"] = logzio_token
     config_dic["filebeat.inputs"][0]["fields"]["logzio_codec"] = logzio_codec
     config_dic["filebeat.inputs"][0]["fields"]["type"] = logzio_type
+    config_dic["filebeat.inputs"][0]["ignore_older"] = _get_ignore_older()
 
     additional_field = _get_additional_fields()
     for key in additional_field:
@@ -56,6 +57,10 @@ def _add_shipping_data():
 
     with open(FILEBEAT_CONF_PATH, "w+") as filebeat_yml:
         yaml.dump(config_dic, filebeat_yml)
+
+
+def _get_ignore_older():
+    return os.getenv("ignoreOlder", "3h")
 
 
 def _get_additional_fields():
@@ -139,5 +144,6 @@ elif "matchContainerName" in os.environ:
     _include_containers()
 else:
     _exclude_containers()
+
 
 os.system(f"{os.getcwd()}/filebeat -e -c {FILEBEAT_CONF_PATH}")
