@@ -134,6 +134,30 @@ def _include_containers():
         yaml.dump(config_dic, updated_filebeat_yml)
 
 
+def _exclude_lines():
+    yaml = YAML()
+    with open(FILEBEAT_CONF_PATH) as filebeat_yaml:
+        config_dic = yaml.load(filebeat_yaml)
+
+    regexes = [expr.strip() for expr in os.environ["excludeLines"].split(',')]
+    config_dic["filebeat.inputs"][0]["exclude_lines"] = regexes
+
+    with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
+        yaml.dump(config_dic, updated_filebeat_yml)
+
+        
+def _include_lines():
+    yaml = YAML()
+    with open(FILEBEAT_CONF_PATH) as filebeat_yaml:
+        config_dic = yaml.load(filebeat_yaml)
+
+    regexes = [expr.strip() for expr in os.environ["includeLines"].split(',')]
+    config_dic["filebeat.inputs"][0]["include_lines"] = regexes
+
+    with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
+        yaml.dump(config_dic, updated_filebeat_yml)
+
+        
 _is_open()
 _add_shipping_data()
 
@@ -145,5 +169,10 @@ elif "matchContainerName" in os.environ:
 else:
     _exclude_containers()
 
+if "excludeLines" in os.environ:
+    _exclude_lines()
+
+if "includeLines" in os.environ:
+    _include_lines()
 
 os.system(f"{os.getcwd()}/filebeat -e -c {FILEBEAT_CONF_PATH}")
