@@ -44,6 +44,8 @@ logzio/docker-collector-logs
 | **matchContainerName** | Comma-separated list of containers you want to collect the logs from. If a container's name partially matches a name on the list, that container's logs are shipped. Otherwise, its logs are ignored. <br /> **Note**: Can't be used with `skipContainerName` |
 | **skipContainerName** | Comma-separated list of containers you want to ignore. If a container's name partially matches a name on the list, that container's logs are ignored. Otherwise, its logs are shipped. <br /> **Note**: Can't be used with `matchContainerName` |
 | **additionalFields** | Include additional fields with every message sent, formatted as `"fieldName1=fieldValue1;fieldName2=fieldValue2"`. <br /> To use an environment variable, format as `"fieldName1=fieldValue1;fieldName2=$ENV_VAR_NAME"`. In that case, the environment variable should be the only value in the field. In case the environment variable can't be resolved, the field will be omitted. |
+| **excludeLines** | Comma-separated list of regular expressions to match the lines that you want Filebeat to exclude. <br /> **Note**: Does not behave well with regular expressions containing commas `,`|
+| **includeLines** | Comma-separated list of regular expressions to match the lines that you want Filebeat to include. <br /> **Note**: Does not behave well with regular expressions containing commas `,`|
 | **ignoreOlder** | **Default** `3h` <br> Logs older than this will be ignored|
 
 **Note**: By default, logs from `docker-collector-logs` and `docker-collector-metrics` containers are ignored.
@@ -53,5 +55,6 @@ logzio/docker-collector-logs
 Spin up your Docker containers if you haven’t done so already. Give your logs a few minutes to get from your system to ours, and then open [Kibana](https://app.logz.io/#/dashboard/kibana).
 
 ### Change log
+- 0.0.4: Added options to include or exclude lines
 - 0.0.3: Support additional fields
 - 0.0.2: Add an option to configure logzio_codec and logzio_type
