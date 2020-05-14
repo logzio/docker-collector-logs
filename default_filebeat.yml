@@ -18,4 +18,4 @@ output:
   logstash:
     hosts: []
     ssl:
-      certificate_authorities: [/etc/pki/tls/certs/COMODORSADomainValidationSecureServerCA.crt]
+      certificate_authorities: [/etc/pki/tls/certs/TrustExternalCARoot_and_USERTrustRSAAAACA.crt]
