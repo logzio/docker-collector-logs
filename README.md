@@ -9,6 +9,7 @@ docker-collector-logs mounts docker.sock and the Docker logs directory to the co
 docker-collector-logs ships logs only.
 If you want to ship metrics to Logz.io, see [docker-collector-metrics](https://github.com/logzio/docker-collector-metrics).
 
+**Note:** Upgrading to a newer version of a docker-collector-logs while it is already running will cause it to resend logs that are within the `ignoreOlder` timeframe. You can minimize log duplicates by setting the `ignoreOlder` parameter of the new docker to a lower value (for example, `20m`.
 
 ## docker-collector-logs setup
 
