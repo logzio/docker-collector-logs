@@ -17,7 +17,8 @@ if logzio_codec not in logzio_codec_list:
     logging.warning(f"LOGZIO_CODEC={logzio_codec} not supported. Make sure you use one of following: "
                     f"{logzio_codec_list}. Falling back to default LOGZIO_CODEC=plain")
     logzio_codec = "plain"
-
+else:
+    logging.info("Using LOGZIO_CODEC={}".format(logzio_codec))
 
 HOST = logzio_url_arr[0]
 PORT = int(logzio_url_arr[1])
