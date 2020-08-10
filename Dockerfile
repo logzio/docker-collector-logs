@@ -1,6 +1,6 @@
 FROM arm32v7/python:3.7-alpine
 
-ENV PACKAGE=filebeat-6.5.4-linux-arm32v7.tar.gz
+ENV PACKAGE=filebeat-6.5.4-arm32v7.tar.gz
 
 
 RUN mkdir -p /opt/filebeat/docker-colletor-logs && \
