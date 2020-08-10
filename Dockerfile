@@ -14,7 +14,7 @@ COPY filebeat-yml-script.py docker-colletor-logs/filebeat-yml-script.py
 COPY $PACKAGE $PACKAGE
 
 RUN apk add --update --no-cache libc6-compat tar && \
-    tar --strip-components=1 -zxf /opt/filebeat/"$PACKAGE" && \
+    tar -zxf /opt/filebeat/"$PACKAGE" && \
     rm -f "$PACKAGE" && \
     wget -P /etc/pki/tls/certs/ https://raw.githubusercontent.com/logzio/public-certificates/master/TrustExternalCARoot_and_USERTrustRSAAAACA.crt && \
     pip3 install -r ./docker-colletor-logs/requirements.txt --user && \
