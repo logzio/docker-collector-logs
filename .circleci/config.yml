@@ -17,4 +17,4 @@ workflows:
           filters:
             branches:
               only:
-                - develop
+                - feature/arm32v7_image
