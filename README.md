@@ -9,7 +9,7 @@ docker-collector-logs mounts docker.sock and the Docker logs directory to the co
 docker-collector-logs ships logs only.
 If you want to ship metrics to Logz.io, see [docker-collector-metrics](https://github.com/logzio/docker-collector-metrics).
 
-**Note:** Upgrading to a newer version of a docker-collector-logs while it is already running will cause it to resend logs that are within the `ignoreOlder` timeframe. You can minimize log duplicates by setting the `ignoreOlder` parameter of the new docker to a lower value (for example, `20m`.
+**Note:** Upgrading to a newer version of a docker-collector-logs while it is already running will cause it to resend logs that are within the `ignoreOlder` timeframe. You can minimize log duplicates by setting the `ignoreOlder` parameter of the new docker to a lower value (for example, `20m`).
 
 ## docker-collector-logs setup
 
@@ -28,7 +28,6 @@ For a complete list of options, see the parameters below the code block.👇
 ```shell
 docker run --name docker-collector-logs \
 --env LOGZIO_TOKEN="<ACCOUNT-TOKEN>" \
---env LOGZIO_URL="<LISTENER-URL>:5015" \
 -v /var/run/docker.sock:/var/run/docker.sock:ro \
 -v /var/lib/docker/containers:/var/lib/docker/containers \
 logzio/docker-collector-logs
@@ -39,7 +38,7 @@ logzio/docker-collector-logs
 | Parameter | Description |
 |---|---|
 | **LOGZIO_TOKEN** | **Required**. Your Logz.io account token. Replace `<ACCOUNT-TOKEN>` with the [token](https://app.logz.io/#/dashboard/settings/general) of the account you want to ship to. |
-| **LOGZIO_URL** | **Required**. Logz.io listener URL to ship the logs to. This URL changes depending on the region your account is hosted in. For example, accounts in the US region ship to `listener.logz.io`, and accounts in the EU region ship to `listener-eu.logz.io`. <br /> For more information, see [Account region](https://docs.logz.io/user-guide/accounts/account-region.html) on the Logz.io Docs. |
+| **LOGZIO_REGION** | **Default**: US region.<br> Logz.io region code to ship the logs to. This region code changes depending on the region your account is hosted in. For example, accounts in the EU region have region code `eu`.<br /> For more information, see [Account region](https://docs.logz.io/user-guide/accounts/account-region.html) on the Logz.io Docs. |
 | **LOGZIO_TYPE** | **Default**: Docker image name <br> The log type you'll use with this Docker. This is shown in your logs under the `type` field in Kibana. <br> Logz.io applies parsing based on `type`. |
 | **LOGZIO_CODEC** | **Default**: `plain`<br> Set to `json` if shipping JSON logs. Otherwise, set to `plain`. |
 | **matchContainerName** | Comma-separated list of containers you want to collect the logs from. If a container's name partially matches a name on the list, that container's logs are shipped. Otherwise, its logs are ignored. <br /> **Note**: Can't be used with `skipContainerName` |
@@ -48,6 +47,7 @@ logzio/docker-collector-logs
 | **excludeLines** | Comma-separated list of regular expressions to match the lines that you want Filebeat to exclude. <br /> **Note**: Does not behave well with regular expressions containing commas `,`|
 | **includeLines** | Comma-separated list of regular expressions to match the lines that you want Filebeat to include. <br /> **Note**: Does not behave well with regular expressions containing commas `,`|
 | **ignoreOlder** | **Default** `3h` <br> Logs older than this will be ignored|
+| **HOSTNAME** | **Default** `''` <br> Insert your host name if you want it to appear under the field `agent.name`. If no value entered,  `agent.name` will show the container's id.|
 
 **Note**: By default, logs from `docker-collector-logs` and `docker-collector-metrics` containers are ignored.
 
@@ -56,6 +56,11 @@ logzio/docker-collector-logs
 Spin up your Docker containers if you haven’t done so already. Give your logs a few minutes to get from your system to ours, and then open [Kibana](https://app.logz.io/#/dashboard/kibana).
 
 ### Change log
+- 0.1.0:
+    - Upgrade to Filebeat 7.8.1.
+    - Update default_filebeat.yml configuration to match newer version.
+    - Support adding hostname.
+    - Deprecated `LOGZIO_URL`. Use `LOGZIO_REGION` instead.
 - 0.0.6: Updated new public SSL certificate in Docker image & Filebeat configuration.
 - 0.0.4: Added options to include or exclude lines
 - 0.0.3: Support additional fields

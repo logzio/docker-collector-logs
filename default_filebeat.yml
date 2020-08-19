@@ -1,10 +1,9 @@
 ############################# Filebeat #####################################
 
 filebeat.inputs:
-- type: docker
-  containers:
-    path: /var/lib/docker/containers
-    ids: '*'
+- type: container
+  paths:
+    - '/var/lib/docker/containers/*/*.log'
   fields_under_root: true
   processors:
   - add_docker_metadata: ~
