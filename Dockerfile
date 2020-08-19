@@ -1,6 +1,6 @@
 FROM python:3.7-alpine
 
-ENV PACKAGE=filebeat-7.8.1-linux-x86_64.tar.gz
+ENV PACKAGE=filebeat-7.9.0-linux-x86_64.tar.gz
 
 
 RUN mkdir -p /opt/filebeat/docker-colletor-logs && \

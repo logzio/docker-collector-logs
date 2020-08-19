@@ -57,8 +57,8 @@ Spin up your Docker containers if you haven’t done so already. Give your logs 
 
 ### Change log
 - 0.1.0:
-    - Upgrade to Filebeat 7.8.1.
-    - Update default_filebeat.yml configuration to match newer version.
+    - Upgrade to Filebeat 7.9.0.
+    - Update default_filebeat.yml configuration to match newer Filebeat version.
     - Support adding hostname.
     - Deprecated `LOGZIO_URL`. Use `LOGZIO_REGION` instead.
 - 0.0.6: Updated new public SSL certificate in Docker image & Filebeat configuration.
