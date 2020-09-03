@@ -6,11 +6,13 @@ import socket
 logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=logging.DEBUG)
 
 # set vars and consts
-logzio_url = os.environ["LOGZIO_URL"]
+DOCKER_COLLECTOR_VERSION = "0.1.0"
+LOGZIO_LISTENER_ADDRESS = "listener.logz.io:5015"
+logzio_url = LOGZIO_LISTENER_ADDRESS
 logzio_url_arr = logzio_url.split(":")
 logzio_token = os.environ["LOGZIO_TOKEN"]
 logzio_type = os.getenv("LOGZIO_TYPE", "docker-collector-logs")
-
+logzio_region = os.getenv("LOGZIO_REGION", "")
 logzio_codec = os.getenv("LOGZIO_CODEC", "plain").lower()
 logzio_codec_list = ["plain", "json"]
 if logzio_codec not in logzio_codec_list:
@@ -19,11 +21,41 @@ if logzio_codec not in logzio_codec_list:
     logzio_codec = "plain"
 
 
-HOST = logzio_url_arr[0]
-PORT = int(logzio_url_arr[1])
 FILEBEAT_CONF_PATH = f"{os.getcwd()}/filebeat.yml"
 SOCKET_TIMEOUT = 3
 FIRST_CHAR = 0
+
+
+def get_listener_url(region):
+    return LOGZIO_LISTENER_ADDRESS.replace("listener.", "listener{}.".format(get_region_code(region)))
+
+
+def get_region_code(region):
+    if region != "us" and region != "":
+        return "-{}".format(region)
+    return ""
+
+
+def _set_url():
+    global logzio_url
+    global logzio_url_arr
+    region = ""
+    is_region = False
+    if 'LOGZIO_REGION' in os.environ:
+        region = os.environ['LOGZIO_REGION']
+        is_region = True
+        if 'LOGZIO_URL' in os.environ:
+            logging.warning("Both LOGZIO_REGION and LOGZIO_URL were entered! Using LOGZIO_REGION.")
+    else:
+        if 'LOGZIO_URL' in os.environ and os.environ['LOGZIO_URL'] != "":
+            logzio_url = os.environ['LOGZIO_URL']
+            logging.warning("Please note that LOGZIO_URL is deprecated! In future versions use LOGZIO_REGION.")
+        else:
+            is_region = True
+
+    if is_region:
+        logzio_url = get_listener_url(region)
+    logzio_url_arr = logzio_url.split(":")
 
 
 def _is_open():
@@ -50,6 +82,10 @@ def _add_shipping_data():
     config_dic["filebeat.inputs"][0]["fields"]["logzio_codec"] = logzio_codec
     config_dic["filebeat.inputs"][0]["fields"]["type"] = logzio_type
     config_dic["filebeat.inputs"][0]["ignore_older"] = _get_ignore_older()
+
+    hostname = _get_host_name()
+    if hostname is not '':
+        config_dic["name"] = hostname
 
     additional_field = _get_additional_fields()
     for key in additional_field:
@@ -157,7 +193,20 @@ def _include_lines():
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
 
-        
+
+def _get_host_name():
+    return os.getenv("HOSTNAME", '')
+
+
+def _display_docker_collector_version():
+    logging.info("Using docker-collector-logs version: {}".format(DOCKER_COLLECTOR_VERSION))
+
+_set_url()
+
+HOST = logzio_url_arr[0]
+PORT = int(logzio_url_arr[1])
+
+_display_docker_collector_version()
 _is_open()
 _add_shipping_data()
 
