@@ -56,6 +56,7 @@ logzio/docker-collector-logs
 Spin up your Docker containers if you haven’t done so already. Give your logs a few minutes to get from your system to ours, and then open [Kibana](https://app.logz.io/#/dashboard/kibana).
 
 ### Change log
+- 0.1.1: Fixed script to match Filebeat 7.9 changes.
 - 0.1.0:
     - **BREAKING CHANGES**:
         - Upgrade to Filebeat 7.9.0.

@@ -6,7 +6,7 @@ import socket
 logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=logging.DEBUG)
 
 # set vars and consts
-DOCKER_COLLECTOR_VERSION = "0.1.0"
+DOCKER_COLLECTOR_VERSION = "0.1.1"
 LOGZIO_LISTENER_ADDRESS = "listener.logz.io:5015"
 logzio_url = LOGZIO_LISTENER_ADDRESS
 logzio_url_arr = logzio_url.split(":")
@@ -145,7 +145,7 @@ def _exclude_containers():
     config_dic["filebeat.inputs"][0]["processors"].append(drop_event)
 
     for container_name in exclude_list:
-        contains = {"contains": {"docker.container.name": container_name}}
+        contains = {"contains": {"container.name": container_name}}
         config_dic["filebeat.inputs"][0]["processors"][1]["drop_event"]["when"]["or"].append(contains)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
@@ -163,7 +163,7 @@ def _include_containers():
     config_dic["filebeat.inputs"][0]["processors"].append(drop_event)
 
     for container_name in include_list:
-        contains = {"not":{"contains": {"docker.container.name": container_name}}}
+        contains = {"not":{"contains": {"container.name": container_name}}}
         config_dic["filebeat.inputs"][0]["processors"][1]["drop_event"]["when"]["and"].append(contains)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
