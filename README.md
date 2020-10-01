@@ -47,7 +47,7 @@ logzio/docker-collector-logs
 | **excludeLines** | Comma-separated list of regular expressions to match the lines that you want Filebeat to exclude. <br /> **Note**: Does not behave well with regular expressions containing commas `,`|
 | **includeLines** | Comma-separated list of regular expressions to match the lines that you want Filebeat to include. <br /> **Note**: Does not behave well with regular expressions containing commas `,`|
 | **ignoreOlder** | **Default** `3h` <br> Logs older than this will be ignored|
-| **renameFields** | Rename fields with every message sent, formatted as `"oldName,newMane;oldName2,newName2"`. <br /> To use an environment variable, format as `"oldName,newMane;oldName2,$ENV_VAR_NAME"`. In that case, the environment variable should be the only value in the field. In case the environment variable can't be resolved, the field will be omitted. |
+| **renameFields** | Rename fields with every message sent, formatted as `"oldName,newName;oldName2,newName2"`. <br /> To use an environment variable, format as `"oldName,newName;oldName2,$ENV_VAR_NAME"`. In that case, the environment variable should be the only value in the field. In case the environment variable can't be resolved, the field will be omitted. |
 | **HOSTNAME** | **Default** `''` <br> Insert your host name if you want it to appear under the field `agent.name`. If no value entered,  `agent.name` will show the container's id.|
 
 **Note**: By default, logs from `docker-collector-logs` and `docker-collector-metrics` containers are ignored.
