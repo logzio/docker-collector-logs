@@ -140,10 +140,10 @@ def get_rename_field(entry, delimiter):
     try:
         old_key, new_key = entry.split(delimiter)
     except ValueError:
-        raise ValueError("Failed to parse entry: {}".format(entry))
+        raise ValueError("Your 'renameField' format isn't correct please check in the documentation for the right format: {}".format(entry))
 
     if old_key == '' or new_key == '':
-        raise ValueError("Failed to parse entry: {}".format(entry))
+        raise ValueError("Your 'renameField' format isn't correct please check in the documentation for the right format: {}".format(entry))
 
     return {"from": old_key, "to": new_key}
 
