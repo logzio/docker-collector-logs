@@ -6,7 +6,7 @@ import socket
 logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=logging.DEBUG)
 
 # set vars and consts
-DOCKER_COLLECTOR_VERSION = "0.1.1"
+DOCKER_COLLECTOR_VERSION = "0.1.2"
 LOGZIO_LISTENER_ADDRESS = "listener.logz.io:5015"
 logzio_url = LOGZIO_LISTENER_ADDRESS
 logzio_url_arr = logzio_url.split(":")
@@ -120,6 +120,34 @@ def _get_additional_fields():
     return fields
 
 
+def _add_rename_fields():
+    yaml = YAML()
+    with open(FILEBEAT_CONF_PATH) as filebeat_yaml:
+        config_dic = yaml.load(filebeat_yaml)
+
+    fields = []
+    for entry in os.environ["renameFields"].split(";"):
+        fields.append(get_rename_field(entry, ","))
+
+    rename_fields = {"rename": {"fields": fields}}
+    config_dic["filebeat.inputs"][0]["processors"].append(rename_fields)
+
+    with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
+        yaml.dump(config_dic, updated_filebeat_yml)
+
+
+def get_rename_field(entry, delimiter):
+    try:
+        old_key, new_key = entry.split(delimiter)
+    except ValueError:
+        raise ValueError("Your 'renameField' format isn't correct please check in the documentation for the right format: {}".format(entry))
+
+    if old_key == '' or new_key == '':
+        raise ValueError("Your 'renameField' format isn't correct please check in the documentation for the right format: {}".format(entry))
+
+    return {"from": old_key, "to": new_key}
+
+
 def parse_entry(entry):
     try:
         key, value = entry.split("=")
@@ -223,5 +251,8 @@ if "excludeLines" in os.environ:
 
 if "includeLines" in os.environ:
     _include_lines()
+
+if "renameFields" in os.environ:
+    _add_rename_fields()
 
 os.system(f"{os.getcwd()}/filebeat -e -c {FILEBEAT_CONF_PATH}")
