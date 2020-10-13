@@ -19,7 +19,8 @@ if logzio_codec not in logzio_codec_list:
     logging.warning(f"LOGZIO_CODEC={logzio_codec} not supported. Make sure you use one of following: "
                     f"{logzio_codec_list}. Falling back to default LOGZIO_CODEC=plain")
     logzio_codec = "plain"
-
+else:
+    logging.info("Using LOGZIO_CODEC={}".format(logzio_codec))
 
 FILEBEAT_CONF_PATH = f"{os.getcwd()}/filebeat.yml"
 SOCKET_TIMEOUT = 3
