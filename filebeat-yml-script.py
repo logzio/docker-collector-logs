@@ -73,7 +73,7 @@ def _is_open():
 
 def _add_shipping_data():
     yaml = YAML()
-    with open("docker-colletor-logs/default_filebeat.yml") as default_filebeat_yml:
+    with open("docker-collector-logs/default_filebeat.yml") as default_filebeat_yml:
         config_dic = yaml.load(default_filebeat_yml)
 
     config_dic["output"]["logstash"]["hosts"].append(logzio_url)
