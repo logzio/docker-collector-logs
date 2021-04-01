@@ -5,10 +5,12 @@ filebeat.inputs:
   paths:
     - '/var/lib/docker/containers/*/*.log'
   fields_under_root: true
-  processors:
-  - add_docker_metadata: ~
   encoding: utf-8
-
+#The following processors are to ensure compatibility with version 7
+processors:
+- add_docker_metadata: ~
+ 
+#For version 7 and higher
 registry_file: /var/lib/filebeat/registry
 
 ############################# Output ##########################################
