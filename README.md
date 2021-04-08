@@ -57,6 +57,7 @@ logzio/docker-collector-logs
 Spin up your Docker containers if you haven’t done so already. Give your logs a few minutes to get from your system to ours, and then open [Kibana](https://app.logz.io/#/dashboard/kibana).
 
 ### Change log
+- 0.1.3: Processors were moved to root level of the yml to allow rename of filebeat metadata fields.
 - 0.1.2: Add rename processor ("renameFields") to specify a list of fields to rename.
 - 0.1.1: Fixed script to match Filebeat 7.9 changes.
 - 0.1.0:

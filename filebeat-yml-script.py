@@ -6,7 +6,7 @@ import socket
 logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=logging.DEBUG)
 
 # set vars and consts
-DOCKER_COLLECTOR_VERSION = "0.1.2"
+DOCKER_COLLECTOR_VERSION = "0.1.3"
 LOGZIO_LISTENER_ADDRESS = "listener.logz.io:5015"
 logzio_url = LOGZIO_LISTENER_ADDRESS
 logzio_url_arr = logzio_url.split(":")
@@ -73,7 +73,7 @@ def _is_open():
 
 def _add_shipping_data():
     yaml = YAML()
-    with open("default_filebeat.yml") as default_filebeat_yml:
+    with open("docker-colletor-logs/default_filebeat.yml") as default_filebeat_yml:
         config_dic = yaml.load(default_filebeat_yml)
 
     config_dic["output"]["logstash"]["hosts"].append(logzio_url)
