@@ -73,7 +73,7 @@ def _is_open():
 
 def _add_shipping_data():
     yaml = YAML()
-    with open("docker-colletor-logs/default_filebeat.yml") as default_filebeat_yml:
+    with open("default_filebeat.yml") as default_filebeat_yml:
         config_dic = yaml.load(default_filebeat_yml)
 
     config_dic["output"]["logstash"]["hosts"].append(logzio_url)
@@ -83,10 +83,11 @@ def _add_shipping_data():
     config_dic["filebeat.inputs"][0]["fields"]["type"] = logzio_type
     config_dic["filebeat.inputs"][0]["ignore_older"] = _get_ignore_older()
 
+
     hostname = _get_host_name()
     if hostname is not '':
         config_dic["name"] = hostname
-
+    
     additional_field = _get_additional_fields()
     for key in additional_field:
         config_dic["filebeat.inputs"][0]["fields"][key] = additional_field[key]
@@ -130,7 +131,7 @@ def _add_rename_fields():
         fields.append(get_rename_field(entry, ","))
 
     rename_fields = {"rename": {"fields": fields}}
-    config_dic["filebeat.inputs"][0]["processors"].append(rename_fields)
+    config_dic["processors"].append(rename_fields)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
@@ -170,11 +171,11 @@ def _exclude_containers():
         exclude_list = ["docker-collector"]
 
     drop_event = {"drop_event": {"when": {"or": []}}}
-    config_dic["filebeat.inputs"][0]["processors"].append(drop_event)
+    config_dic["processors"].append(drop_event)
 
     for container_name in exclude_list:
         contains = {"contains": {"container.name": container_name}}
-        config_dic["filebeat.inputs"][0]["processors"][1]["drop_event"]["when"]["or"].append(contains)
+        config_dic["processors"][1]["drop_event"]["when"]["or"].append(contains)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
@@ -188,11 +189,11 @@ def _include_containers():
     include_list = [container.strip() for container in os.environ["matchContainerName"].split(",")]
 
     drop_event = {"drop_event": {"when": {"and": []}}}
-    config_dic["filebeat.inputs"][0]["processors"].append(drop_event)
+    config_dic["processors"].append(drop_event)
 
     for container_name in include_list:
         contains = {"not":{"contains": {"container.name": container_name}}}
-        config_dic["filebeat.inputs"][0]["processors"][1]["drop_event"]["when"]["and"].append(contains)
+        config_dic["processors"][1]["drop_event"]["when"]["and"].append(contains)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
@@ -254,5 +255,6 @@ if "includeLines" in os.environ:
 
 if "renameFields" in os.environ:
     _add_rename_fields()
+
 
 os.system(f"{os.getcwd()}/filebeat -e -c {FILEBEAT_CONF_PATH}")
