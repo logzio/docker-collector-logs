@@ -1,12 +1,12 @@
 import logging
 import os
-from ruamel.yaml import YAML
 import socket
+from ruamel.yaml import YAML
 
 logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=logging.DEBUG)
 
 # set vars and consts
-DOCKER_COLLECTOR_VERSION = "0.1.2"
+DOCKER_COLLECTOR_VERSION = "0.1.4"
 LOGZIO_LISTENER_ADDRESS = "listener.logz.io:5015"
 logzio_url = LOGZIO_LISTENER_ADDRESS
 logzio_url_arr = logzio_url.split(":")
@@ -19,7 +19,6 @@ if logzio_codec not in logzio_codec_list:
     logging.warning(f"LOGZIO_CODEC={logzio_codec} not supported. Make sure you use one of following: "
                     f"{logzio_codec_list}. Falling back to default LOGZIO_CODEC=plain")
     logzio_codec = "plain"
-
 
 FILEBEAT_CONF_PATH = f"{os.getcwd()}/filebeat.yml"
 SOCKET_TIMEOUT = 3
@@ -73,7 +72,7 @@ def _is_open():
 
 def _add_shipping_data():
     yaml = YAML()
-    with open("docker-colletor-logs/default_filebeat.yml") as default_filebeat_yml:
+    with open("docker-collector-logs/default_filebeat.yml") as default_filebeat_yml:
         config_dic = yaml.load(default_filebeat_yml)
 
     config_dic["output"]["logstash"]["hosts"].append(logzio_url)
@@ -83,10 +82,10 @@ def _add_shipping_data():
     config_dic["filebeat.inputs"][0]["fields"]["type"] = logzio_type
     config_dic["filebeat.inputs"][0]["ignore_older"] = _get_ignore_older()
 
+
     hostname = _get_host_name()
     if hostname is not '':
         config_dic["name"] = hostname
-
     additional_field = _get_additional_fields()
     for key in additional_field:
         config_dic["filebeat.inputs"][0]["fields"][key] = additional_field[key]
@@ -94,9 +93,23 @@ def _add_shipping_data():
     with open(FILEBEAT_CONF_PATH, "w+") as filebeat_yml:
         yaml.dump(config_dic, filebeat_yml)
 
-
 def _get_ignore_older():
     return os.getenv("ignoreOlder", "3h")
+
+def _get_multiline_type():
+    return os.getenv("multilineType", 'pattern')
+
+
+def _get_multiline_pattern():
+    return os.getenv("multilinePattern", '')
+
+
+def _get_multiline_negate():
+    return os.getenv("multilineNegate", 'false')
+
+
+def _get_multiline_match():
+    return os.getenv("multilineMatch", 'after')
 
 
 def _get_additional_fields():
@@ -111,7 +124,7 @@ def _get_additional_fields():
     for key, value in filtered.items():
         if value[FIRST_CHAR] == '$':
             try:
-                fields[key] = os.environ[value[FIRST_CHAR+1:]]
+                fields[key] = os.environ[value[FIRST_CHAR + 1:]]
             except KeyError:
                 continue
         else:
@@ -130,7 +143,7 @@ def _add_rename_fields():
         fields.append(get_rename_field(entry, ","))
 
     rename_fields = {"rename": {"fields": fields}}
-    config_dic["filebeat.inputs"][0]["processors"].append(rename_fields)
+    config_dic["processors"].append(rename_fields)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
@@ -170,11 +183,11 @@ def _exclude_containers():
         exclude_list = ["docker-collector"]
 
     drop_event = {"drop_event": {"when": {"or": []}}}
-    config_dic["filebeat.inputs"][0]["processors"].append(drop_event)
+    config_dic["processors"].append(drop_event)
 
     for container_name in exclude_list:
         contains = {"contains": {"container.name": container_name}}
-        config_dic["filebeat.inputs"][0]["processors"][1]["drop_event"]["when"]["or"].append(contains)
+        config_dic["processors"][1]["drop_event"]["when"]["or"].append(contains)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
@@ -188,11 +201,11 @@ def _include_containers():
     include_list = [container.strip() for container in os.environ["matchContainerName"].split(",")]
 
     drop_event = {"drop_event": {"when": {"and": []}}}
-    config_dic["filebeat.inputs"][0]["processors"].append(drop_event)
+    config_dic["processors"].append(drop_event)
 
     for container_name in include_list:
-        contains = {"not":{"contains": {"container.name": container_name}}}
-        config_dic["filebeat.inputs"][0]["processors"][1]["drop_event"]["when"]["and"].append(contains)
+        contains = {"not": {"contains": {"container.name": container_name}}}
+        config_dic["processors"][1]["drop_event"]["when"]["and"].append(contains)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
@@ -209,7 +222,7 @@ def _exclude_lines():
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
 
-        
+
 def _include_lines():
     yaml = YAML()
     with open(FILEBEAT_CONF_PATH) as filebeat_yaml:
@@ -222,12 +235,28 @@ def _include_lines():
         yaml.dump(config_dic, updated_filebeat_yml)
 
 
+def _add_multiline_type():
+    yaml = YAML()
+
+    with open(FILEBEAT_CONF_PATH) as filebeat_yaml:
+        config_dic = yaml.load(filebeat_yaml)
+
+    config_dic["filebeat.inputs"][0]["multiline.type"] = _get_multiline_type()
+    config_dic["filebeat.inputs"][0]["multiline.pattern"] = _get_multiline_pattern()
+    config_dic["filebeat.inputs"][0]["multiline.negate"] = _get_multiline_negate()
+    config_dic["filebeat.inputs"][0]["multiline.match"] = _get_multiline_match()
+
+    with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
+        yaml.dump(config_dic, updated_filebeat_yml)
+
+
 def _get_host_name():
     return os.getenv("HOSTNAME", '')
 
 
 def _display_docker_collector_version():
     logging.info("Using docker-collector-logs version: {}".format(DOCKER_COLLECTOR_VERSION))
+
 
 _set_url()
 
@@ -238,6 +267,7 @@ _display_docker_collector_version()
 _is_open()
 _add_shipping_data()
 
+
 if "matchContainerName" in os.environ and "skipContainerName" in os.environ:
     logging.error("Can have only one of skipContainerName or matchContainerName")
     raise KeyError
@@ -245,6 +275,14 @@ elif "matchContainerName" in os.environ:
     _include_containers()
 else:
     _exclude_containers()
+
+if "multilineType" in os.environ or "multilineNegate" in os.environ or "multilineMatch" in os.environ and "multilinePattern" not in os.environ:
+    logging.error("Please insert multilinePattern as well")
+    raise KeyError
+
+if "multilinePattern" in os.environ:
+    _add_multiline_type()
+
 
 if "excludeLines" in os.environ:
     _exclude_lines()
@@ -254,5 +292,6 @@ if "includeLines" in os.environ:
 
 if "renameFields" in os.environ:
     _add_rename_fields()
+
 
 os.system(f"{os.getcwd()}/filebeat -e -c {FILEBEAT_CONF_PATH}")

@@ -49,6 +49,10 @@ logzio/docker-collector-logs
 | **ignoreOlder** | **Default** `3h` <br> Logs older than this will be ignored|
 | **renameFields** | Rename fields with every message sent, formatted as `"oldName,newName;oldName2,newName2"`. <br /> To use an environment variable, format as `"oldName,newName;oldName2,$ENV_VAR_NAME"`. In that case, the environment variable should be the only value in the field. In case the environment variable can't be resolved, the field will be omitted. |
 | **HOSTNAME** | **Default** `''` <br> Insert your host name if you want it to appear under the field `agent.name`. If no value entered,  `agent.name` will show the container's id.|
+| **multilinePattern** | **Default** `''` <br> Insert your regex pattern.|
+| **multilineNegate** | **Default** `'false'` <br> Insert `'true'` to negate the pattern. <br /> **Note**: Cannot be used without multilinePattern.|
+| **multilineMatch** | **Default** `'after'` <br>  Specifies how Filebeat combines matching lines into an event. The settings are `after` or `before`. The behavior of these settings depends on what you specify for negate. <br /> **Note**: Cannot be used without multilinePattern.|
+
 
 **Note**: By default, logs from `docker-collector-logs` and `docker-collector-metrics` containers are ignored.
 
@@ -57,6 +61,11 @@ logzio/docker-collector-logs
 Spin up your Docker containers if you haven’t done so already. Give your logs a few minutes to get from your system to ours, and then open [Kibana](https://app.logz.io/#/dashboard/kibana).
 
 ### Change log
+- 0.1.4:
+    - **BREAKING CHANGES**:
+    - Upgrade to Filebeat 7.12.1.
+    - Added multiline variables for support of multiline patterns.
+- 0.1.3: Processors were moved to root level of the yml to allow rename of filebeat metadata fields.
 - 0.1.2: Add rename processor ("renameFields") to specify a list of fields to rename.
 - 0.1.1: Fixed script to match Filebeat 7.9 changes.
 - 0.1.0:
