@@ -63,8 +63,8 @@ Spin up your Docker containers if you haven’t done so already. Give your logs 
 ### Change log
 - 0.1.4:
     - **BREAKING CHANGES**:
-    - Upgrade to Filebeat 7.12.1.
-    - Added multiline variables for support of multiline patterns.
+        - Upgrade to Filebeat 7.12.1.
+        - Added multiline variables for support of multiline patterns.
 - 0.1.3: Processors were moved to root level of the yml to allow rename of filebeat metadata fields.
 - 0.1.2: Add rename processor ("renameFields") to specify a list of fields to rename.
 - 0.1.1: Fixed script to match Filebeat 7.9 changes.

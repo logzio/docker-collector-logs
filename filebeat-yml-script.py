@@ -86,6 +86,7 @@ def _add_shipping_data():
     hostname = _get_host_name()
     if hostname is not '':
         config_dic["name"] = hostname
+
     additional_field = _get_additional_fields()
     for key in additional_field:
         config_dic["filebeat.inputs"][0]["fields"][key] = additional_field[key]
@@ -204,7 +205,7 @@ def _include_containers():
     config_dic["processors"].append(drop_event)
 
     for container_name in include_list:
-        contains = {"not": {"contains": {"container.name": container_name}}}
+        contains = {"not":{"contains": {"container.name": container_name}}}
         config_dic["processors"][1]["drop_event"]["when"]["and"].append(contains)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
