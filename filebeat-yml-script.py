@@ -82,7 +82,6 @@ def _add_shipping_data():
     config_dic["filebeat.inputs"][0]["fields"]["type"] = logzio_type
     config_dic["filebeat.inputs"][0]["ignore_older"] = _get_ignore_older()
 
-
     hostname = _get_host_name()
     if hostname is not '':
         config_dic["name"] = hostname
@@ -153,10 +152,14 @@ def get_rename_field(entry, delimiter):
     try:
         old_key, new_key = entry.split(delimiter)
     except ValueError:
-        raise ValueError("Your 'renameField' format isn't correct please check in the documentation for the right format: {}".format(entry))
+        raise ValueError(
+            "Your 'renameField' format isn't correct please check in the documentation for the right format: {}".format(
+                entry))
 
     if old_key == '' or new_key == '':
-        raise ValueError("Your 'renameField' format isn't correct please check in the documentation for the right format: {}".format(entry))
+        raise ValueError(
+            "Your 'renameField' format isn't correct please check in the documentation for the right format: {}".format(
+                entry))
 
     return {"from": old_key, "to": new_key}
 
@@ -178,7 +181,8 @@ def _exclude_containers():
         config_dic = yaml.load(filebeat_yaml)
 
     try:
-        exclude_list = ["docker-collector"] + [container.strip() for container in os.environ["skipContainerName"].split(",")]
+        exclude_list = ["docker-collector"] + [container.strip() for container in
+                                               os.environ["skipContainerName"].split(",")]
     except KeyError:
         exclude_list = ["docker-collector"]
 
@@ -237,6 +241,7 @@ def _include_lines():
 
 def _add_multiline_type():
     yaml = YAML()
+    yaml.preserve_quotes = True
 
     with open(FILEBEAT_CONF_PATH) as filebeat_yaml:
         config_dic = yaml.load(filebeat_yaml)
@@ -276,11 +281,9 @@ elif "matchContainerName" in os.environ:
 else:
     _exclude_containers()
 
-if "multilineType" in os.environ or "multilineNegate" in os.environ or "multilineMatch" in os.environ and "multilinePattern" not in os.environ:
-    logging.error("Please insert multilinePattern as well")
-    raise KeyError
-
-if "multilinePattern" in os.environ:
+if ("multilineType" in os.environ or "multilineNegate" in os.environ or "multilineMatch" in os.environ) and "multilinePattern" not in os.environ:
+    raise Exception("Please insert multilinePattern as well")
+elif "multilinePattern" in os.environ:
     _add_multiline_type()
 
 
