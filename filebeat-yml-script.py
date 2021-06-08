@@ -283,7 +283,7 @@ else:
     _exclude_containers()
 
 if ("multilineType" in os.environ or "multilineNegate" in os.environ or "multilineMatch" in os.environ) and "multilinePattern" not in os.environ:
-    raise Exception("Please insert multilinePattern as well")
+    raise ValueError("Please insert multilinePattern as well")
 elif "multilinePattern" in os.environ:
     _add_multiline_type()
 
