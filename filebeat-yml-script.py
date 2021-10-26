@@ -6,8 +6,9 @@ from ruamel.yaml import YAML
 logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=logging.DEBUG)
 
 # set vars and consts
-DOCKER_COLLECTOR_VERSION = "0.1.4"
+DOCKER_COLLECTOR_VERSION = "0.1.5"
 LOGZIO_LISTENER_ADDRESS = "listener.logz.io:5015"
+PROCESSORS_AVAILABLE_INDEX = 3
 logzio_url = LOGZIO_LISTENER_ADDRESS
 logzio_url_arr = logzio_url.split(":")
 logzio_token = os.environ["LOGZIO_TOKEN"]
@@ -192,7 +193,7 @@ def _exclude_containers():
 
     for container_name in exclude_list:
         contains = {"contains": {"container.name": container_name}}
-        config_dic["processors"][1]["drop_event"]["when"]["or"].append(contains)
+        config_dic["processors"][PROCESSORS_AVAILABLE_INDEX]["drop_event"]["when"]["or"].append(contains)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
@@ -210,7 +211,7 @@ def _include_containers():
 
     for container_name in include_list:
         contains = {"not":{"contains": {"container.name": container_name}}}
-        config_dic["processors"][1]["drop_event"]["when"]["and"].append(contains)
+        config_dic["processors"][PROCESSORS_AVAILABLE_INDEX]["drop_event"]["when"]["and"].append(contains)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
