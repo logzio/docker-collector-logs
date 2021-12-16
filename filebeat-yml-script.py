@@ -6,7 +6,7 @@ from ruamel.yaml import YAML
 logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=logging.DEBUG)
 
 # set vars and consts
-DOCKER_COLLECTOR_VERSION = "0.1.5"
+DOCKER_COLLECTOR_VERSION = "0.1.6"
 LOGZIO_LISTENER_ADDRESS = "listener.logz.io:5015"
 PROCESSORS_AVAILABLE_INDEX = 3
 logzio_url = LOGZIO_LISTENER_ADDRESS
