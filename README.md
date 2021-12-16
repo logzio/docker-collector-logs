@@ -9,7 +9,11 @@ docker-collector-logs mounts docker.sock and the Docker logs directory to the co
 docker-collector-logs ships logs only.
 If you want to ship metrics to Logz.io, see [docker-collector-metrics](https://github.com/logzio/docker-collector-metrics).
 
-**Note:** Upgrading to a newer version of a docker-collector-logs while it is already running will cause it to resend logs that are within the `ignoreOlder` timeframe. You can minimize log duplicates by setting the `ignoreOlder` parameter of the new docker to a lower value (for example, `20m`).
+**Note:**
+- Upgrading to a newer version of a docker-collector-logs while it is already running will cause it to resend logs that are within the `ignoreOlder` timeframe. You can minimize log duplicates by setting the `ignoreOlder` parameter of the new docker to a lower value (for example, `20m`).
+- This integration supports **ARM architecture** as of `logzio/docker-collector-logs:0.1.6`.
+
+
 
 ## docker-collector-logs setup
 
@@ -61,6 +65,8 @@ logzio/docker-collector-logs
 Spin up your Docker containers if you haven’t done so already. Give your logs a few minutes to get from your system to ours, and then open [Kibana](https://app.logz.io/#/dashboard/kibana).
 
 ### Change log
+- 0.1.6:
+    Support ARM architecture.
 - 0.1.5:
     Added rename processors.
 - 0.1.4:
