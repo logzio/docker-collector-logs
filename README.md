@@ -68,7 +68,8 @@ Spin up your Docker containers if you haven’t done so already. Give your logs 
 ### Change log
 
 - 0.2.0:
-    Allow changing log level.
+  - Allow changing log level.
+  - Upgrade base image to python 3.11.
 - 0.1.6:
     Support ARM architecture.
 - 0.1.5:
