@@ -3,13 +3,30 @@ import os
 import socket
 from ruamel.yaml import YAML
 
-logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=logging.DEBUG)
+
+def get_log_level():
+    default_level = "info"
+    log_level_from_user = os.getenv("LOG_LEVEL", default_level).lower()
+    levels_map = {
+        "debug": logging.DEBUG,
+        "info": logging.INFO,
+        "warning": logging.WARNING,
+        "error": logging.ERROR
+    }
+
+    if log_level_from_user not in levels_map:
+        log_level_from_user = default_level
+
+    return log_level_from_user, levels_map[log_level_from_user]
+
 
 # set vars and consts
-DOCKER_COLLECTOR_VERSION = "0.1.6"
+DOCKER_COLLECTOR_VERSION = "0.2.0"
 LOGZIO_LISTENER_ADDRESS = "listener.logz.io:5015"
 PROCESSORS_AVAILABLE_INDEX = 3
 logzio_url = LOGZIO_LISTENER_ADDRESS
+log_level_filebeat, log_level_logger = get_log_level()
+logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=log_level_logger)
 logzio_url_arr = logzio_url.split(":")
 logzio_token = os.environ["LOGZIO_TOKEN"]
 logzio_type = os.getenv("LOGZIO_TYPE", "docker-collector-logs")
@@ -82,9 +99,10 @@ def _add_shipping_data():
     config_dic["filebeat.inputs"][0]["fields"]["logzio_codec"] = logzio_codec
     config_dic["filebeat.inputs"][0]["fields"]["type"] = logzio_type
     config_dic["filebeat.inputs"][0]["ignore_older"] = _get_ignore_older()
+    config_dic["logging.level"] = log_level_filebeat
 
     hostname = _get_host_name()
-    if hostname is not '':
+    if hostname != '':
         config_dic["name"] = hostname
 
     additional_field = _get_additional_fields()
@@ -94,8 +112,10 @@ def _add_shipping_data():
     with open(FILEBEAT_CONF_PATH, "w+") as filebeat_yml:
         yaml.dump(config_dic, filebeat_yml)
 
+
 def _get_ignore_older():
     return os.getenv("ignoreOlder", "3h")
+
 
 def _get_multiline_type():
     return os.getenv("multilineType", 'pattern')
