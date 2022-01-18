@@ -102,7 +102,7 @@ def _add_shipping_data():
     config_dic["logging.level"] = log_level_filebeat
 
     hostname = _get_host_name()
-    if hostname is not '':
+    if hostname != '':
         config_dic["name"] = hostname
 
     additional_field = _get_additional_fields()
@@ -112,8 +112,10 @@ def _add_shipping_data():
     with open(FILEBEAT_CONF_PATH, "w+") as filebeat_yml:
         yaml.dump(config_dic, filebeat_yml)
 
+
 def _get_ignore_older():
     return os.getenv("ignoreOlder", "3h")
+
 
 def _get_multiline_type():
     return os.getenv("multilineType", 'pattern')
