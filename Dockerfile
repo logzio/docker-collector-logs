@@ -1,4 +1,4 @@
-FROM python:3.11.0a2-alpine
+FROM python:3.11.0b4-alpine
 
 ENV PACKAGE=filebeat-7.12.1-linux-x86_64.tar.gz
 
