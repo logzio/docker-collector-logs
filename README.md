@@ -67,6 +67,8 @@ Spin up your Docker containers if you haven’t done so already. Give your logs 
 
 ### Change log
 
+- 0.3.0:
+  - Upgrade to Filebeat 8.3.3.
 - 0.2.0:
   - Allow changing log level.
   - Upgrade base image to python 3.11.

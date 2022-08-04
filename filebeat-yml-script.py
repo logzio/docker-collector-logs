@@ -21,7 +21,6 @@ def get_log_level():
 
 
 # set vars and consts
-DOCKER_COLLECTOR_VERSION = "0.2.0"
 LOGZIO_LISTENER_ADDRESS = "listener.logz.io:5015"
 PROCESSORS_AVAILABLE_INDEX = 3
 logzio_url = LOGZIO_LISTENER_ADDRESS
@@ -281,16 +280,11 @@ def _get_host_name():
     return os.getenv("HOSTNAME", '')
 
 
-def _display_docker_collector_version():
-    logging.info("Using docker-collector-logs version: {}".format(DOCKER_COLLECTOR_VERSION))
-
-
 _set_url()
 
 HOST = logzio_url_arr[0]
 PORT = int(logzio_url_arr[1])
 
-_display_docker_collector_version()
 _is_open()
 _add_shipping_data()
 
