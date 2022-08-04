@@ -32,7 +32,7 @@ logzio_type = os.getenv("LOGZIO_TYPE", "docker-collector-logs")
 logzio_region = os.getenv("LOGZIO_REGION", "")
 logzio_codec = os.getenv("LOGZIO_CODEC", "plain").lower()
 logzio_codec_list = ["plain", "json"]
-input_encoding = os.getenv("INPUT_ENCODING", "utf-8")
+input_encoding = os.getenv("INPUT_ENCODING", "utf-8").lower()
 if logzio_codec not in logzio_codec_list:
     logging.warning(f"LOGZIO_CODEC={logzio_codec} not supported. Make sure you use one of following: "
                     f"{logzio_codec_list}. Falling back to default LOGZIO_CODEC=plain")
@@ -90,6 +90,7 @@ def _is_open():
 
 def _add_shipping_data():
     yaml = YAML()
+    _validate_encoding()
     with open("docker-collector-logs/default_filebeat.yml") as default_filebeat_yml:
         config_dic = yaml.load(default_filebeat_yml)
 
@@ -280,6 +281,22 @@ def _add_multiline_type():
 
 def _get_host_name():
     return os.getenv("HOSTNAME", '')
+
+
+def _validate_encoding():
+    global input_encoding
+    # According to https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-container.html#_encoding
+    valid_encodings = ["plain", "utf-8", "utf8", "gbk", "iso8859-6e", "iso8859-6i", "iso8859-8e", "iso8859-8i",
+                       "iso8859-1", "iso8859-2", "iso8859-3", "iso8859-4", "iso8859-5", "iso8859-6", "iso8859-7",
+                       "iso8859-8", "iso8859-9", "iso8859-10", "iso8859-13", "iso8859-14", "iso8859-15", "iso8859-16",
+                       "cp437", "cp850", "cp852", "cp855", "cp858", "cp860", "cp862", "cp863", "cp865", "cp866",
+                       "ebcdic-037", "ebcdic-1040", "ebcdic-1047", "koi8r", "koi8u", "macintosh", "macintosh-cyrillic",
+                       "windows1250", "windows1251", "windows1252", "windows1253", "windows1254", "windows1255",
+                       "windows1256", "windows1257", "windows1258", "windows874", "utf-16-bom", "utf-16be-bom",
+                       "utf-16le-bom"]
+    if input_encoding not in valid_encodings:
+        logging.info(f"Your input_encoding {input_encoding} is invalid. Reverting to default utf-8")
+        input_encoding = "utf-8"
 
 
 _set_url()
