@@ -32,6 +32,7 @@ logzio_type = os.getenv("LOGZIO_TYPE", "docker-collector-logs")
 logzio_region = os.getenv("LOGZIO_REGION", "")
 logzio_codec = os.getenv("LOGZIO_CODEC", "plain").lower()
 logzio_codec_list = ["plain", "json"]
+input_encoding = os.getenv("INPUT_ENCODING", "utf-8")
 if logzio_codec not in logzio_codec_list:
     logging.warning(f"LOGZIO_CODEC={logzio_codec} not supported. Make sure you use one of following: "
                     f"{logzio_codec_list}. Falling back to default LOGZIO_CODEC=plain")
@@ -98,6 +99,7 @@ def _add_shipping_data():
     config_dic["filebeat.inputs"][0]["fields"]["logzio_codec"] = logzio_codec
     config_dic["filebeat.inputs"][0]["fields"]["type"] = logzio_type
     config_dic["filebeat.inputs"][0]["ignore_older"] = _get_ignore_older()
+    config_dic["filebeat.inputs"][0]["encoding"] = input_encoding
     config_dic["logging.level"] = log_level_filebeat
 
     hostname = _get_host_name()

@@ -57,6 +57,7 @@ logzio/docker-collector-logs
 | **multilineNegate**    | **Default** `'false'` <br> Insert `'true'` to negate the pattern. <br /> **Note**: Cannot be used without multilinePattern. See [Filebeat's official documentation](https://www.elastic.co/guide/en/beats/filebeat/7.12/multiline-examples.html#multiline) for further info.                                                                                                                                      |
 | **multilineMatch**     | **Default** `'after'` <br>  Specifies how Filebeat combines matching lines into an event. The settings are `after` or `before`. The behavior of these settings depends on what you specify for negate. <br /> **Note**: Cannot be used without multilinePattern. See [Filebeat's official documentation](https://www.elastic.co/guide/en/beats/filebeat/7.12/multiline-examples.html#multiline) for further info. |
 | **LOG_LEVEL**          | **Default** `info`. Set log level for the collector. Allowed values are: `debug`, `info`, `warning`, `error`.                                                                                                                                                                                                                                                                                                     |
+| **INPUT_ENCODING**     | **Default** `utf-8`. Here is a full list of [valid encodings](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-container.html#_encoding) you can use.                                                                                                                                                                                                                                        |
 
 
 **Note**: By default, logs from `docker-collector-logs` and `docker-collector-metrics` containers are ignored.
@@ -69,6 +70,8 @@ Spin up your Docker containers if you haven’t done so already. Give your logs 
 
 - 0.3.0:
   - Upgrade to Filebeat 8.3.3.
+  - Allow configuring encoding for input (`INPUT_ENCODING`).
+  - Remove print of version number.
 - 0.2.0:
   - Allow changing log level.
   - Upgrade base image to python 3.11.
