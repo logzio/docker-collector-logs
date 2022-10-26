@@ -1,4 +1,4 @@
-FROM python:3.11.0a2-alpine
+FROM python:3.11-alpine
 
 ENV PACKAGE=filebeat-8.3.3-linux-x86_64.tar.gz
 
