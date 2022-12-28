@@ -70,7 +70,7 @@ Spin up your Docker containers if you haven’t done so already. Give your logs 
 
 
 - 0.4.0:
-  - Migrate to Filebear OSS 8.5.3.
+  - Migrate to Filebeat OSS 8.5.3.
   - Upgrade base image to python 3.12.
 - 0.3.0:
   - Upgrade to Filebeat 8.3.3.
