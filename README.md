@@ -68,6 +68,10 @@ Spin up your Docker containers if you haven’t done so already. Give your logs 
 
 ### Change log
 
+
+- 0.4.0:
+  - Migrate to Filebear OSS 8.5.3.
+  - Upgrade base image to python 3.12.
 - 0.3.0:
   - Upgrade to Filebeat 8.3.3.
   - Allow configuring encoding for input (`INPUT_ENCODING`).
@@ -75,6 +79,11 @@ Spin up your Docker containers if you haven’t done so already. Give your logs 
 - 0.2.0:
   - Allow changing log level.
   - Upgrade base image to python 3.11.
+
+
+<details>
+  <summary markdown="span"> Expand to check old versions </summary>
+
 - 0.1.6:
     Support ARM architecture.
 - 0.1.5:
@@ -96,3 +105,5 @@ Spin up your Docker containers if you haven’t done so already. Give your logs 
 - 0.0.4: Added options to include or exclude lines
 - 0.0.3: Support additional fields
 - 0.0.2: Add an option to configure logzio_codec and logzio_type
+
+</details>
