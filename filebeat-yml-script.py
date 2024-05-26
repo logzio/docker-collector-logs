@@ -2,7 +2,16 @@ import logging
 import os
 import socket
 from ruamel.yaml import YAML
+import subprocess
 
+def get_git_tag():
+    try:
+        # Returns the most recent tag
+        git_tag = subprocess.check_output(["git", "describe", "--tags"], stderr=subprocess.STDOUT).strip().decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        logging.error("Failed to get git tag: " + str(e.output.decode('utf-8')))
+        git_tag = "unknown"
+    return git_tag
 
 def get_log_level():
     default_level = "info"
@@ -94,6 +103,12 @@ def _add_shipping_data():
     with open("docker-collector-logs/default_filebeat.yml") as default_filebeat_yml:
         config_dic = yaml.load(default_filebeat_yml)
 
+    # Fetch the Git tag
+    git_tag = get_git_tag()
+
+    config_dic["output"]["logstash"]["headers"] = {
+        "User-Agent": f"logzio-docker-version-{git_tag}-logs"
+    }
     config_dic["output"]["logstash"]["hosts"].append(logzio_url)
     config_dic["filebeat.inputs"][0]["fields"] = {}
     config_dic["filebeat.inputs"][0]["fields"]["token"] = logzio_token
