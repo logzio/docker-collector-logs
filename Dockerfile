@@ -1,4 +1,4 @@
-FROM python:3.12.0a2-alpine
+FROM python:3.13.0b2-alpine
 
 ENV PACKAGE=filebeat-oss-8.5.3-linux-x86_64.tar.gz
 
