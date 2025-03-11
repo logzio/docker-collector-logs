@@ -43,6 +43,8 @@ jobs:
           context: .
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
+          sbom: true
+          provenance: mode=max
           tags: ${{ steps.dockeraction.outputs.tags }}-amd
           labels: ${{ steps.dockeraction.outputs.labels }}
 
@@ -53,6 +55,8 @@ jobs:
           context: .
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
+          sbom: true
+          provenance: mode=max
           tags: logzio/docker-collector-logs:latest-amd
           labels: ${{ steps.dockeraction.outputs.labels }}
 
@@ -62,6 +66,8 @@ jobs:
           context: .
           file: ./Dockerfile.arm
           platforms: linux/arm64
+          sbom: true
+          provenance: mode=max
           push: ${{ github.event_name != 'pull_request' }}
           tags: logzio/docker-collector-logs:latest-arm
           labels: ${{ steps.dockeraction.outputs.labels }}
@@ -72,6 +78,8 @@ jobs:
           context: .
           file: ./Dockerfile.arm
           platforms: linux/arm64
+          sbom: true
+          provenance: mode=max
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.dockeraction.outputs.tags }}-arm
           labels: ${{ steps.dockeraction.outputs.labels }}
