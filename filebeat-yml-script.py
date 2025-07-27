@@ -27,7 +27,10 @@ logzio_url = LOGZIO_LISTENER_ADDRESS
 log_level_filebeat, log_level_logger = get_log_level()
 logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=log_level_logger)
 logzio_url_arr = logzio_url.split(":")
-logzio_token = os.environ["LOGZIO_TOKEN"]
+logzio_token = os.getenv("LOGZIO_TOKEN")
+if not logzio_token:
+    logging.error("LOGZIO_TOKEN is not set")
+    raise ValueError("LOGZIO_TOKEN is not set")
 logzio_type = os.getenv("LOGZIO_TYPE", "docker-collector-logs")
 logzio_region = os.getenv("LOGZIO_REGION", "")
 logzio_codec = os.getenv("LOGZIO_CODEC", "plain").lower()
