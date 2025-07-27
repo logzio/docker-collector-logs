@@ -1,3 +1,7 @@
+> [!WARNING]
+> This integration will be deprecated on September 1st, 2025, and will not receive any further updates. 
+> The new integration is available at [docker-logs-collector](https://github.com/logzio/docker-logs-collector).
+
 # docker-collector-logs
 
 docker-collector-logs is a Docker container that uses Filebeat to collect logs from other Docker containers and forward those logs to your Logz.io account.
@@ -67,8 +71,13 @@ logzio/docker-collector-logs
 Spin up your Docker containers if you haven’t done so already. Give your logs a few minutes to get from your system to ours, and then open [Kibana](https://app.logz.io/#/dashboard/kibana).
 
 ### Change log
-
-
+- 0.5.0:
+  - Upgrade Filebeat OSS to version 9.0.4.
+    - **BREAKING CHANGES**:
+      - `container` Filebeat input was deperacted, replace with `filestream` input's container parser.
+      - Removed `add_docker_metadata` deprecated processor since the `container` parser now handles Docker metadata automatically.
+  - Upgrade Python base image to version: 3.14.0.
+  - Update listener certificate from `SectigoRSADomainValidationSecureServerCA.crt` to `AAACertificateServices.crt`
 - 0.4.0:
   - Migrate to Filebeat OSS 8.5.3.
   - Upgrade base image to python 3.12.

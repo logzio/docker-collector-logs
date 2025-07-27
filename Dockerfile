@@ -1,6 +1,8 @@
-FROM python:3.13.0b4-alpine
 
-ENV PACKAGE=filebeat-oss-8.5.3-linux-x86_64.tar.gz
+FROM python:3.14.0rc1-alpine3.22
+
+
+ENV PACKAGE=filebeat-oss-9.0.4-linux-x86_64.tar.gz
 
 RUN mkdir -p /opt/filebeat/docker-colletor-logs && \
     mkdir -p /etc/pki/tls/certs
@@ -15,7 +17,7 @@ RUN apk add --update --no-cache libc6-compat wget tar && \
     wget https://artifacts.elastic.co/downloads/beats/filebeat/$PACKAGE && \
     tar --strip-components=1 -zxf /opt/filebeat/"$PACKAGE" && \
     rm -f "$PACKAGE" && \
-    wget -P /etc/pki/tls/certs/ https://raw.githubusercontent.com/logzio/public-certificates/master/SectigoRSADomainValidationSecureServerCA.crt && \
+    wget -P /etc/pki/tls/certs/ https://raw.githubusercontent.com/logzio/public-certificates/master/AAACertificateServices.crt && \
     pip3 install -r ./docker-collector-logs/requirements.txt --user && \
     rm -f ./docker-collector-logs/requirements.txt
 
