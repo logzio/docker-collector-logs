@@ -9,11 +9,14 @@ filebeat.inputs:
   paths:
     - /var/lib/docker/containers/*/*.log
   parsers:
-    - container: ~
+    - container:
+        format: docker
+        stream: all
   fields_under_root: true
   fingerprint:
     enabled: false # Enabling fingerprint mode delays ingesting new files until they grow to at least offset+length bytes in size, so they can be fingerprinted. Until then these files are ignored.
   prospector.scanner.fingerprint.enabled: false
+  ignore_older: 3h
 
 #The following processors are to ensure compatibility with version 7
 processors:
