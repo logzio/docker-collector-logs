@@ -73,8 +73,9 @@ Spin up your Docker containers if you haven’t done so already. Give your logs 
 ### Change log
 - 0.5.0:
   - Upgrade Filebeat OSS to version 9.0.4.
-    - `container` Filebeat input was deperacted, replace with `filestream` input's container parser.
-    - Removed `add_docker_metadata` deprecated processor since the `container` parser now handles Docker metadata automatically.
+    - **BREAKING CHANGES**:
+      - `container` Filebeat input was deperacted, replace with `filestream` input's container parser.
+      - Removed `add_docker_metadata` deprecated processor since the `container` parser now handles Docker metadata automatically.
   - Upgrade Python base image to version: 3.14.0.
   - Update listener certificate from `SectigoRSADomainValidationSecureServerCA.crt` to `AAACertificateServices.crt`
 - 0.4.0:
