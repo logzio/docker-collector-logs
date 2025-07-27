@@ -1,5 +1,6 @@
 > [!WARNING]
 > This integration will be deprecated on September 1st, 2025, and will not receive any further updates. 
+
 > The new integration is available at [docker-logs-collector](https://github.com/logzio/docker-logs-collector).
 
 # docker-collector-logs
