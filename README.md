@@ -71,6 +71,8 @@ logzio/docker-collector-logs
 Spin up your Docker containers if you haven’t done so already. Give your logs a few minutes to get from your system to ours, and then open [Kibana](https://app.logz.io/#/dashboard/kibana).
 
 ### Change log
+- 0.5.1:
+  - Align multiline settings under `parsers`
 - 0.5.0:
   - Upgrade Filebeat OSS to version 9.0.4.
     - **BREAKING CHANGES**:
