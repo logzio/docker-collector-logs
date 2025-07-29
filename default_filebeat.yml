@@ -20,14 +20,14 @@ filebeat.inputs:
 
 #The following processors are to ensure compatibility with version 7
 processors:
-- add_docker_metadata:
+  - add_docker_metadata:
     host: "unix:///var/run/docker.sock"
-- rename:
+  - rename:
     fields:
      - from: "agent"
        to: "beat_agent"
     ignore_missing: true
-- rename:
+  - rename:
     fields:
      - from: "log.file.path"
        to: "source"

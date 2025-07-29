@@ -23,6 +23,11 @@ def get_log_level():
 # set vars and consts
 LOGZIO_LISTENER_ADDRESS = "listener.logz.io:5015"
 PROCESSORS_AVAILABLE_INDEX = 3
+FILEBEAT_INPUT_FIELD = "filebeat.inputs"
+FILEBEAT_PARSER_FIELD = "parsers"
+FILEBEAT_PROCESSORS_FIELD = "processors"
+DEFAULT_CONTAINER_NAME = "docker-collector-logs"
+
 logzio_url = LOGZIO_LISTENER_ADDRESS
 log_level_filebeat, log_level_logger = get_log_level()
 logging.basicConfig(format='%(asctime)s\t%(levelname)s\t%(message)s', level=log_level_logger)
@@ -98,12 +103,12 @@ def _add_shipping_data():
         config_dic = yaml.load(default_filebeat_yml)
 
     config_dic["output"]["logstash"]["hosts"].append(logzio_url)
-    config_dic["filebeat.inputs"][0]["fields"] = {}
-    config_dic["filebeat.inputs"][0]["fields"]["token"] = logzio_token
-    config_dic["filebeat.inputs"][0]["fields"]["logzio_codec"] = logzio_codec
-    config_dic["filebeat.inputs"][0]["fields"]["type"] = logzio_type
-    config_dic["filebeat.inputs"][0]["ignore_older"] = _get_ignore_older()
-    config_dic["filebeat.inputs"][0]["encoding"] = input_encoding
+    config_dic[FILEBEAT_INPUT_FIELD][0]["fields"] = {}
+    config_dic[FILEBEAT_INPUT_FIELD][0]["fields"]["token"] = logzio_token
+    config_dic[FILEBEAT_INPUT_FIELD][0]["fields"]["logzio_codec"] = logzio_codec
+    config_dic[FILEBEAT_INPUT_FIELD][0]["fields"]["type"] = logzio_type
+    config_dic[FILEBEAT_INPUT_FIELD][0]["ignore_older"] = _get_ignore_older()
+    config_dic[FILEBEAT_INPUT_FIELD][0]["encoding"] = input_encoding
     config_dic["logging.level"] = log_level_filebeat
 
     hostname = _get_host_name()
@@ -112,7 +117,7 @@ def _add_shipping_data():
 
     additional_field = _get_additional_fields()
     for key in additional_field:
-        config_dic["filebeat.inputs"][0]["fields"][key] = additional_field[key]
+        config_dic[FILEBEAT_INPUT_FIELD][0]["fields"][key] = additional_field[key]
 
     with open(FILEBEAT_CONF_PATH, "w+") as filebeat_yml:
         yaml.dump(config_dic, filebeat_yml)
@@ -169,7 +174,7 @@ def _add_rename_fields():
         fields.append(get_rename_field(entry, ","))
 
     rename_fields = {"rename": {"fields": fields}}
-    config_dic["processors"].append(rename_fields)
+    config_dic[FILEBEAT_PROCESSORS_FIELD].append(rename_fields)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
@@ -203,22 +208,23 @@ def parse_entry(entry):
 
 
 def _exclude_containers():
+    pass
     yaml = YAML()
     with open(FILEBEAT_CONF_PATH) as filebeat_yaml:
         config_dic = yaml.load(filebeat_yaml)
 
     try:
-        exclude_list = ["docker-collector"] + [container.strip() for container in
+        exclude_list = [DEFAULT_CONTAINER_NAME] + [container.strip() for container in
                                                os.environ["skipContainerName"].split(",")]
     except KeyError:
-        exclude_list = ["docker-collector"]
+        exclude_list = [DEFAULT_CONTAINER_NAME]
 
     drop_event = {"drop_event": {"when": {"or": []}}}
-    config_dic["processors"].append(drop_event)
+    config_dic[FILEBEAT_PROCESSORS_FIELD].append(drop_event)
 
     for container_name in exclude_list:
         contains = {"contains": {"container.name": container_name}}
-        config_dic["processors"][PROCESSORS_AVAILABLE_INDEX]["drop_event"]["when"]["or"].append(contains)
+        config_dic[FILEBEAT_PROCESSORS_FIELD][PROCESSORS_AVAILABLE_INDEX]["drop_event"]["when"]["or"].append(contains)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
@@ -232,11 +238,11 @@ def _include_containers():
     include_list = [container.strip() for container in os.environ["matchContainerName"].split(",")]
 
     drop_event = {"drop_event": {"when": {"and": []}}}
-    config_dic["processors"].append(drop_event)
+    config_dic[FILEBEAT_PROCESSORS_FIELD].append(drop_event)
 
     for container_name in include_list:
         contains = {"not":{"contains": {"container.name": container_name}}}
-        config_dic["processors"][PROCESSORS_AVAILABLE_INDEX]["drop_event"]["when"]["and"].append(contains)
+        config_dic[FILEBEAT_PROCESSORS_FIELD][PROCESSORS_AVAILABLE_INDEX]["drop_event"]["when"]["and"].append(contains)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
@@ -248,7 +254,7 @@ def _exclude_lines():
         config_dic = yaml.load(filebeat_yaml)
 
     regexes = [expr.strip() for expr in os.environ["excludeLines"].split(',')]
-    config_dic["filebeat.inputs"][0]["exclude_lines"] = regexes
+    config_dic[FILEBEAT_INPUT_FIELD][0]["exclude_lines"] = regexes
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
@@ -260,7 +266,7 @@ def _include_lines():
         config_dic = yaml.load(filebeat_yaml)
 
     regexes = [expr.strip() for expr in os.environ["includeLines"].split(',')]
-    config_dic["filebeat.inputs"][0]["include_lines"] = regexes
+    config_dic[FILEBEAT_INPUT_FIELD][0]["include_lines"] = regexes
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
@@ -273,10 +279,15 @@ def _add_multiline_type():
     with open(FILEBEAT_CONF_PATH) as filebeat_yaml:
         config_dic = yaml.load(filebeat_yaml)
 
-    config_dic["filebeat.inputs"][0]["multiline.type"] = _get_multiline_type()
-    config_dic["filebeat.inputs"][0]["multiline.pattern"] = _get_multiline_pattern()
-    config_dic["filebeat.inputs"][0]["multiline.negate"] = _get_multiline_negate()
-    config_dic["filebeat.inputs"][0]["multiline.match"] = _get_multiline_match()
+    multiline_conf = {
+        "multiline": {
+            "type": _get_multiline_type(),
+            "pattern": _get_multiline_pattern(),
+            "negate": _get_multiline_negate(),
+            "match": _get_multiline_match()
+        }
+    }
+    config_dic[FILEBEAT_INPUT_FIELD][0][FILEBEAT_PARSER_FIELD].append(multiline_conf)
 
     with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
         yaml.dump(config_dic, updated_filebeat_yml)
