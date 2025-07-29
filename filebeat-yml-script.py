@@ -203,43 +203,45 @@ def parse_entry(entry):
 
 
 def _exclude_containers():
-    yaml = YAML()
-    with open(FILEBEAT_CONF_PATH) as filebeat_yaml:
-        config_dic = yaml.load(filebeat_yaml)
-
-    try:
-        exclude_list = ["docker-collector"] + [container.strip() for container in
-                                               os.environ["skipContainerName"].split(",")]
-    except KeyError:
-        exclude_list = ["docker-collector"]
-
-    drop_event = {"drop_event": {"when": {"or": []}}}
-    config_dic["processors"].append(drop_event)
-
-    for container_name in exclude_list:
-        contains = {"contains": {"container.name": container_name}}
-        config_dic["processors"][PROCESSORS_AVAILABLE_INDEX]["drop_event"]["when"]["or"].append(contains)
-
-    with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
-        yaml.dump(config_dic, updated_filebeat_yml)
+    pass
+    # yaml = YAML()
+    # with open(FILEBEAT_CONF_PATH) as filebeat_yaml:
+    #     config_dic = yaml.load(filebeat_yaml)
+    #
+    # try:
+    #     exclude_list = ["docker-collector"] + [container.strip() for container in
+    #                                            os.environ["skipContainerName"].split(",")]
+    # except KeyError:
+    #     exclude_list = ["docker-collector"]
+    #
+    # drop_event = {"drop_event": {"when": {"or": []}}}
+    # config_dic["processors"].append(drop_event)
+    #
+    # for container_name in exclude_list:
+    #     contains = {"contains": {"container.name": container_name}}
+    #     config_dic["processors"][PROCESSORS_AVAILABLE_INDEX]["drop_event"]["when"]["or"].append(contains)
+    #
+    # with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
+    #     yaml.dump(config_dic, updated_filebeat_yml)
 
 
 def _include_containers():
-    yaml = YAML()
-    with open(FILEBEAT_CONF_PATH) as filebeat_yml:
-        config_dic = yaml.load(filebeat_yml)
-
-    include_list = [container.strip() for container in os.environ["matchContainerName"].split(",")]
-
-    drop_event = {"drop_event": {"when": {"and": []}}}
-    config_dic["processors"].append(drop_event)
-
-    for container_name in include_list:
-        contains = {"not":{"contains": {"container.name": container_name}}}
-        config_dic["processors"][PROCESSORS_AVAILABLE_INDEX]["drop_event"]["when"]["and"].append(contains)
-
-    with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
-        yaml.dump(config_dic, updated_filebeat_yml)
+    pass
+    # yaml = YAML()
+    # with open(FILEBEAT_CONF_PATH) as filebeat_yml:
+    #     config_dic = yaml.load(filebeat_yml)
+    #
+    # include_list = [container.strip() for container in os.environ["matchContainerName"].split(",")]
+    #
+    # drop_event = {"drop_event": {"when": {"and": []}}}
+    # config_dic["processors"].append(drop_event)
+    #
+    # for container_name in include_list:
+    #     contains = {"not":{"contains": {"container.name": container_name}}}
+    #     config_dic["processors"][PROCESSORS_AVAILABLE_INDEX]["drop_event"]["when"]["and"].append(contains)
+    #
+    # with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
+    #     yaml.dump(config_dic, updated_filebeat_yml)
 
 
 def _exclude_lines():
