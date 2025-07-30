@@ -1,4 +1,4 @@
-FROM python:3.14.0rc1-alpine3.22
+FROM python:3.13.5-alpine3.22
 
 ENV PACKAGE=filebeat-oss-9.0.4-linux-arm64.tar.gz
 
