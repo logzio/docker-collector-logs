@@ -41,6 +41,7 @@ logzio_region = os.getenv("LOGZIO_REGION", "")
 logzio_codec = os.getenv("LOGZIO_CODEC", "plain").lower()
 logzio_codec_list = ["plain", "json"]
 input_encoding = os.getenv("INPUT_ENCODING", "utf-8").lower()
+disable_default_drop_events = os.getenv("DISABLE_DEFAULT_DROP_EVENTS", "false").lower()
 if logzio_codec not in logzio_codec_list:
     logging.warning(f"LOGZIO_CODEC={logzio_codec} not supported. Make sure you use one of following: "
                     f"{logzio_codec_list}. Falling back to default LOGZIO_CODEC=plain")
@@ -208,26 +209,30 @@ def parse_entry(entry):
 
 
 def _exclude_containers():
-    pass
     yaml = YAML()
     with open(FILEBEAT_CONF_PATH) as filebeat_yaml:
         config_dic = yaml.load(filebeat_yaml)
 
+    base_exclude_list = []
+    if disable_default_drop_events == "false":
+        base_exclude_list = [DEFAULT_CONTAINER_NAME]
+
     try:
-        exclude_list = [DEFAULT_CONTAINER_NAME] + [container.strip() for container in
+        exclude_list = base_exclude_list + [container.strip() for container in
                                                os.environ["skipContainerName"].split(",")]
     except KeyError:
-        exclude_list = [DEFAULT_CONTAINER_NAME]
+        exclude_list = base_exclude_list
 
-    drop_event = {"drop_event": {"when": {"or": []}}}
-    config_dic[FILEBEAT_PROCESSORS_FIELD].append(drop_event)
+    if exclude_list:
+        drop_event = {"drop_event": {"when": {"or": []}}}
 
-    for container_name in exclude_list:
-        contains = {"contains": {"container.name": container_name}}
-        config_dic[FILEBEAT_PROCESSORS_FIELD][PROCESSORS_AVAILABLE_INDEX]["drop_event"]["when"]["or"].append(contains)
+        for container_name in exclude_list:
+            contains = {"contains": {"container.name": container_name}}
+            drop_event["drop_event"]["when"]["or"].append(contains)
+        config_dic[FILEBEAT_PROCESSORS_FIELD].append(drop_event)
 
-    with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
-        yaml.dump(config_dic, updated_filebeat_yml)
+        with open(FILEBEAT_CONF_PATH, "w+") as updated_filebeat_yml:
+            yaml.dump(config_dic, updated_filebeat_yml)
 
 
 def _include_containers():
